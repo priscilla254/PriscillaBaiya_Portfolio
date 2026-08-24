@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Synthetic age estimation — Priscilla Baiya</title>
+    <meta
+      name="description"
+      content="Case study: generating synthetic aged faces with Stable Diffusion and AgeTransGAN to train facial age estimation models."
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="wordmark" href="../../">Priscilla Baiya</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="../../#work">Work</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </nav>
+    </header>
+
+    <main id="main" class="article-wrap">
+      <a class="back" href="../../">← Home</a>
+
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">Case study · Computer vision</p>
+          <h1>Can synthetic faces teach a model to estimate age?</h1>
+          <p class="lede">
+            A two-stage generation pipeline — Stable Diffusion for identity,
+            AgeTransGAN for aging — built to test whether synthetic data can
+            train facial age estimators without leaning so hard on real
+            biometric photographs.
+          </p>
+          <p class="meta">
+            MSc Computer Science (Artificial Intelligence) · University of Kent
+            · Dissertation project
+          </p>
+        </header>
+
+        <p>
+          Age estimation from a face looks like a straightforward regression
+          problem until you look at the data. Public datasets are
+          privacy-sensitive, demographically skewed, and thin at the tails —
+          young children and older adults especially. Models trained on that
+          mix inherit the gaps. This project asked a practical question: if we
+          <em>generate</em> the missing faces, can the estimator still learn a
+          useful mapping from appearance to age?
+        </p>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>Two-stage synthesis</strong>
+            <span>Stable Diffusion for identity, AgeTransGAN for age</span>
+          </div>
+          <div class="stat">
+            <strong>Privacy-first data</strong>
+            <span>Training faces that do not belong to real people</span>
+          </div>
+        </div>
+
+        <h2>The problem</h2>
+        <p>
+          Supervised age estimators need labelled faces at every point on the
+          lifespan. Collecting those photographs is expensive, ethically
+          fraught, and almost never balanced. Celebrity-heavy corpora over-
+          represent a narrow band of ethnicity, lighting, and age. The result
+          is familiar: mean absolute error looks acceptable in aggregate, then
+          collapses on the groups you care about most.
+        </p>
+        <p>
+          Synthetic data is an appealing workaround, but only if two things
+          hold at once. The generated face has to look the right age, and it
+          still has to look like the same person. Drift on either axis poisons
+          the label.
+        </p>
+
+        <figure class="figure">
+          <div
+            class="figure__frame"
+            role="img"
+            aria-label="Placeholder for the real-world age distribution chart"
+          >
+            <strong>Figure placeholder</strong>
+            <span>Age-group coverage: real benchmark vs. target mix</span>
+            <small>assets/images/age-distribution.png</small>
+          </div>
+          <figcaption>
+            Figure 1. Typical real-world age histograms leave children and
+            older adults under-sampled. Replace this frame with the
+            distribution chart from the dissertation.
+          </figcaption>
+        </figure>
+
+        <h2>Approach</h2>
+        <p>
+          Rather than train a single model to invent a person
+          <em>and</em> age them, I split the job. First, Stable Diffusion
+          produced a pool of synthetic identities. Then a modified
+          <a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">AgeTransGAN</a>
+          aged each identity into the target groups. Only after that did an
+          age estimator see the images.
+        </p>
+
+        <h3>1. Synthesise identities</h3>
+        <p>
+          Diffusion generated the base faces. Prompts and filters were used to
+          keep outputs on-distribution as faces — frontal enough to age, varied
+          enough not to collapse into one look — without photographing anyone.
+        </p>
+
+        <h3>2. Age the same person</h3>
+        <p>
+          AgeTransGAN (Hsu et al., ECCV 2022) is built for this second step:
+          an encoder–decoder generator with a conditional discriminator and an
+          embedded age classifier. Cycle consistency, age classification, and
+          cross-age identity loss try to pull age and identity apart. I adapted
+          the official model so it would accept the diffusion outputs rather
+          than the dataset it was originally trained against.
+        </p>
+
+        <h3>3. Estimate age</h3>
+        <p>
+          The estimator was trained and compared under a few data regimes:
+          real faces only, synthetic faces only, and mixed. The point was not
+          to claim a new architecture. It was to measure whether the synthetic
+          set was doing useful work — especially where real data is scarce.
+        </p>
+
+        <figure class="figure">
+          <div
+            class="figure__frame"
+            role="img"
+            aria-label="Placeholder for the generation pipeline diagram"
+          >
+            <strong>Figure placeholder</strong>
+            <span>Pipeline: prompt → diffusion → AgeTransGAN → estimator</span>
+            <small>assets/images/pipeline.png</small>
+          </div>
+          <figcaption>
+            Figure 2. End-to-end pipeline. Drop in the system diagram from the
+            dissertation.
+          </figcaption>
+        </figure>
+
+        <div class="callout">
+          <p>
+            Design constraint: age had to be controllable; identity had to
+            survive the edit. If either failed, the synthetic label was
+            noise.
+          </p>
+        </div>
+
+        <h2>What I looked at</h2>
+        <p>
+          Evaluation sat on two layers. Image quality and identity
+          preservation asked whether the generator was doing its job. Age error
+          asked whether the estimator actually learned from the result.
+        </p>
+        <ul>
+          <li>
+            <strong>Age fidelity</strong> — do transformed faces land in the
+            intended age group, checked by an independent estimator and by
+            inspection.
+          </li>
+          <li>
+            <strong>Identity preservation</strong> — does a face recogniser
+            still match the aged image to its source identity.
+          </li>
+          <li>
+            <strong>Downstream error</strong> — mean absolute error and
+            cumulative score on held-out real faces, broken down by age band.
+          </li>
+        </ul>
+
+        <div class="stats">
+          <div class="stat">
+            <strong>MAE · CS@k</strong>
+            <span>Standard age-estimation metrics, reported overall and by band</span>
+          </div>
+          <div class="stat">
+            <strong>Identity match</strong>
+            <span>A check that aging did not quietly swap the person</span>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <div
+            class="figure__frame"
+            role="img"
+            aria-label="Placeholder for qualitative aging examples"
+          >
+            <strong>Figure placeholder</strong>
+            <span>Same synthetic identity, aged across target groups</span>
+            <small>assets/images/aging-grid.png</small>
+          </div>
+          <figcaption>
+            Figure 3. Qualitative grid: one identity walked across age groups.
+            Replace with the dissertation figure.
+          </figcaption>
+        </figure>
+
+        <h2>What the results showed</h2>
+        <p>
+          The useful story was in the breakdown, not the headline number.
+          Synthetic data was strongest as a complement: it thickened the sparse
+          age bands that real datasets under-represent. Used alone, it was more
+          brittle — generators leave texture artefacts, and an estimator can
+          learn those instead of aging.
+        </p>
+        <p>
+          Identity drift showed up most on the largest age jumps (child to
+          adult, adult to elderly). Those were exactly the transformations the
+          pipeline was meant to unlock, and exactly where the losses had to
+          work hardest. Mixing a modest amount of real data with the synthetic
+          set was the more stable training recipe.
+        </p>
+
+        <figure class="figure">
+          <div
+            class="figure__frame"
+            role="img"
+            aria-label="Placeholder for MAE by age group"
+          >
+            <strong>Figure placeholder</strong>
+            <span>MAE by age group: real / synthetic / mixed</span>
+            <small>assets/images/mae-by-age.png</small>
+          </div>
+          <figcaption>
+            Figure 4. Error by age band across training mixes. This is the
+            chart to swap in from the results chapter.
+          </figcaption>
+        </figure>
+
+        <h2>Trade-offs</h2>
+        <p>
+          Synthetic data does not remove bias; it relocates it. Diffusion
+          models and aging GANs both carry the demographics of their training
+          sets. If those generators under-represent a group, the estimator will
+          too — with the extra risk that the failure looks like a clean,
+          balanced dataset.
+        </p>
+        <p>
+          There is also a domain gap. A model can do well on synthetic faces
+          and still stumble on real cameras, compression, and pose. That is why
+          every claim in this project is anchored on real held-out images, not
+          on the generated test set.
+        </p>
+
+        <h2>What I would do next</h2>
+        <ol>
+          <li>
+            Tighten identity preservation on large age gaps, or reject
+            transformations that fail a verification threshold before they
+            enter training.
+          </li>
+          <li>
+            Audit the synthetic pool for demographic coverage instead of
+            assuming generation equals diversity.
+          </li>
+          <li>
+            Compare diffusion-native aging (editing in latent or prompt space)
+            against the two-stage GAN pipeline, on the same estimator.
+          </li>
+        </ol>
+
+        <h2>Links</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">Modified AgeTransGAN repo</a>
+            — aging applied to Stable Diffusion faces
+          </li>
+          <li>
+            Hsu, G.-S., Xie, R.-C., Chen, Z.-T., &amp; Lin, Y.-H. (2022).
+            <em>AgeTransGAN for Facial Age Transformation with Rectified Performance Metrics.</em>
+            ECCV.
+          </li>
+        </ul>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="../../">← Back to home</a></p>
+      <p class="footer-links">
+        <a href="mailto:priscillawambui8@gmail.com">Email</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </p>
+    </footer>
+  </body>
+</html>
