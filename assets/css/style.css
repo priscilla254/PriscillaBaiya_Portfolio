@@ -148,11 +148,38 @@ a:hover {
 
 .section h2 {
   margin: 0 0 1.25rem;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem + 2pt);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.about {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 2.25rem 2.75rem;
+  align-items: start;
+}
+
+.about__photo {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--placeholder);
+}
+
+.about__copy p {
+  margin: 0 0 1rem;
+  max-width: 38rem;
+  color: #2a2723;
+}
+
+.about__copy p:last-child {
+  margin-bottom: 0;
 }
 
 .card {
@@ -411,6 +438,14 @@ figcaption {
 
   .stats {
     grid-template-columns: 1fr;
+  }
+
+  .about {
+    grid-template-columns: 1fr;
+  }
+
+  .about__photo {
+    max-width: 14rem;
   }
 
   .site-footer {
