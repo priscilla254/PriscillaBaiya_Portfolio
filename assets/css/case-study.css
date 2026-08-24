@@ -1,0 +1,185 @@
+/* ---- Case study: skimmable layout additions ---- */
+
+/* Wider wrap just for case study pages that use the two-column body */
+.article-wrap--wide {
+  max-width: var(--wide);
+}
+
+/* At-a-glance band: the whole story in one horizontal scan */
+.glance {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin: 2rem 0 3rem;
+  padding: 1.4rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.glance__item {
+  padding-inline: 0.9rem;
+  border-left: 2px solid var(--line);
+}
+
+.glance__item:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+
+.glance__item strong {
+  display: block;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  line-height: 1.15;
+}
+
+.glance__item span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+/* Two-column editorial layout: running text left, callouts/figures right */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 0 2.75rem;
+  align-items: start;
+}
+
+.layout > .layout__main {
+  min-width: 0;
+}
+
+.layout > .layout__rail {
+  min-width: 0;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* rail cards: compact figures/callouts that sit beside the paragraph they support */
+.rail-card {
+  padding: 1.1rem 1.2rem 1.2rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.rail-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.7rem;
+}
+
+.rail-card__label {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rail-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* Pipeline diagram block: replaces long prose in the approach section */
+.pipeline {
+  margin: 1.6rem 0 1rem;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.pipeline img,
+.pipeline svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 900 / 260;
+  display: block;
+}
+
+.pipeline-note {
+  margin: 0.9rem 0 2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pipeline-note a {
+  font-weight: 500;
+}
+
+/* Follow-up stat grid: replaces prose-heavy summary */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.result-grid .stat {
+  background: var(--accent-soft);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .layout > .layout__rail {
+    position: static;
+    order: -1;
+    grid-template-columns: 1fr 1fr;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .glance {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .glance__item {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout > .layout__rail {
+    grid-template-columns: 1fr;
+  }
+
+  .glance {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Keep the sticky rail from painting over the footer */
+.article-wrap--wide ~ .site-footer,
+body > .site-footer {
+  position: relative;
+  z-index: 2;
+  background: var(--paper);
+}

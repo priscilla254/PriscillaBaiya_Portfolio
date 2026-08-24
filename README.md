@@ -2,7 +2,7 @@
 
 Static site for selected work. No build step, no framework — semantic HTML and a single stylesheet.
 
-The first case study covers an MSc dissertation project on **synthetic facial age estimation**: generating identities with Stable Diffusion, aging them with a modified [AgeTransGAN](https://github.com/priscilla254/AgeTransGAN_myedit), and using the resulting set to train and evaluate age estimators.
+The first case study covers an MSc dissertation on **synthetic facial age estimation**: a three-stage pipeline (SDXL → AgeTransGAN → CodeFormer) for a demographically balanced dataset, with a fairness and bias evaluation and a follow-up comparison of text-to-image models.
 
 ## Local preview
 
@@ -20,12 +20,14 @@ npx serve .
 │   └── synthetic-age-estimation/
 │       └── index.html
 ├── assets/
-│   ├── css/style.css
-│   └── images/          ← dissertation figures
+│   ├── css/
+│   │   ├── style.css
+│   │   └── case-study.css
+│   └── images/
 └── README.md
 ```
 
-Drop charts into `assets/images/` and point the figure placeholders on the case study page at those files.
+Optional charts and figures can go in `assets/images/`.
 
 ## Deploy
 

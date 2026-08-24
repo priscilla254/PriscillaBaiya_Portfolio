@@ -6,9 +6,10 @@
     <title>Synthetic age estimation — Priscilla Baiya</title>
     <meta
       name="description"
-      content="Case study: generating synthetic aged faces with Stable Diffusion and AgeTransGAN to train facial age estimation models."
+      content="Case study: a three-stage generative pipeline for a demographically diverse synthetic dataset for facial age estimation, with a fairness evaluation and a follow-up comparison of text-to-image models."
     />
     <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/case-study.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -22,263 +23,184 @@
       </nav>
     </header>
 
-    <main id="main" class="article-wrap">
+    <main id="main" class="article-wrap article-wrap--wide">
       <a class="back" href="../../">← Home</a>
 
       <article>
         <header class="article-header">
-          <p class="eyebrow">Case study · Computer vision</p>
-          <h1>Can synthetic faces teach a model to estimate age?</h1>
+          <p class="eyebrow">Case study · Biometric age estimation · Fairness</p>
+          <h1>Can synthetic faces train a fairer age estimator?</h1>
           <p class="lede">
-            A two-stage generation pipeline — Stable Diffusion for identity,
-            AgeTransGAN for aging — built to test whether synthetic data can
-            train facial age estimators without leaning so hard on real
-            biometric photographs.
+            A generative pipeline for a demographically balanced,
+            privacy-conscious dataset for facial age estimation —
+            evaluated for fairness, accuracy, and realism, then stress-tested
+            against commercial text-to-image models.
           </p>
           <p class="meta">
             MSc Computer Science (Artificial Intelligence) · University of Kent
-            · Dissertation project
+            · Dissertation, supervised by Elena Botoeva
           </p>
         </header>
 
+        <div class="glance">
+          <div class="glance__item">
+            <strong>1,378</strong>
+            <span>synthetic images, balanced by ethnicity, gender, age</span>
+          </div>
+          <div class="glance__item">
+            <strong>0.70</strong>
+            <span>overall FairFace accuracy — down to 0.34 for the weakest group</span>
+          </div>
+          <div class="glance__item">
+            <strong>13–17</strong>
+            <span>age bin where the model fails hardest — the one that matters most</span>
+          </div>
+          <div class="glance__item">
+            <strong>43–49%</strong>
+            <span>ethnicity error rate, even in commercial text-to-image tools</span>
+          </div>
+        </div>
+
         <p>
           Age estimation from a face looks like a straightforward regression
-          problem until you look at the data. Public datasets are
-          privacy-sensitive, demographically skewed, and thin at the tails —
-          young children and older adults especially. Models trained on that
-          mix inherit the gaps. This project asked a practical question: if we
-          <em>generate</em> the missing faces, can the estimator still learn a
-          useful mapping from appearance to age?
+          problem until you look at the data. Public benchmarks are
+          privacy-sensitive, demographically skewed, and thin exactly where
+          it matters most — the 16–17 boundary that separates minors from
+          adults in age-restricted services. This project asked a practical
+          question: if we <em>generate</em> the missing faces instead of
+          collecting them, can the result support fairer age estimation —
+          and where does it still fall short?
         </p>
 
-        <div class="stats">
-          <div class="stat">
-            <strong>Two-stage synthesis</strong>
-            <span>Stable Diffusion for identity, AgeTransGAN for age</span>
+        <div class="layout">
+          <div class="layout__main">
+            <h2>The problem</h2>
+            <p>
+              Two forces compound the data problem. First, demographic bias:
+              UTKFace, a standard benchmark, is 45.5% Caucasian, and models
+              trained on skewed data under-perform on the groups they're
+              meant to protect. Second, the UK's Online Safety Act (2025)
+              now requires platforms to run robust age checks — raising the
+              stakes on exactly the age range where models are weakest and
+              real training data is scarcest, for good ethical reasons.
+            </p>
+
+            <h2>Approach</h2>
+            <p>
+              Three deliberate stages, each handling one job: generate a
+              diverse identity, age it convincingly, then restore artefacts
+              introduced along the way.
+            </p>
+
+            <div class="pipeline">
+              <img src="../../assets/images/pipeline-diagram.svg" width="900" height="260" alt="Pipeline diagram: Stable Diffusion XL generates seed identities across 11 ethnicities, AgeTransGAN ages each identity across 5 bins while preserving identity, CodeFormer restores artefacts, producing 1,378 labelled images." />
+            </div>
+            <p class="pipeline-note">
+              Full implementation, prompt framework, and the modified
+              AgeTransGAN integration are in
+              <a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">the repo</a>.
+            </p>
+
+            <h2>What the results showed</h2>
+            <p>
+              Synthetic pipelines produced visually convincing,
+              demographically broad images — but fairness didn't come for
+              free. FairFace classification held up well for some groups
+              (Indian 1.00, East Asian 0.97, White 0.92) and broke down for
+              others (Southeast Asian 0.34, Middle Eastern 0.39) — the
+              generative model itself wasn't capturing some demographic
+              features distinctly enough.
+            </p>
+            <p>
+              The more consequential failure was in age, not ethnicity.
+              InsightFace correctly classified only 4 of the 13–17 images
+              and 3 of the 18–20 images, with most pushed into older bins —
+              a systematic overestimation of minors' ages, which is exactly
+              the failure mode an age-verification system can't afford.
+              Interestingly, human evaluators found these same younger
+              images convincing — the automated model and human judgement
+              were catching different problems entirely.
+            </p>
+
+            <h2>Follow-up: do off-the-shelf tools do any better?</h2>
+            <p>
+              The dissertation used SDXL to generate the base identities in Stage 1 -
+              but SDXL is only one option. We wondered if other text-to-image models
+              could do better at generating better base identities.
+            </p>
+            <div class="result-grid">
+              <div class="stat">
+                <strong>3 models</strong>
+                <span>GPT-Image-1, Midjourney, Stable Diffusion — compared head to head</span>
+              </div>
+              <div class="stat">
+                <strong>350</strong>
+                <span>images generated per model, across 7 ethnicities</span>
+              </div>
+              <div class="stat">
+                <strong>43–49%</strong>
+                <span>ethnicity prediction error, all three models</span>
+              </div>
+              <div class="stat">
+                <strong>Up to 100%</strong>
+                <span>error rate for specific ethnicity/gender pairs</span>
+              </div>
+              <div class="stat">
+                <strong>13.4%</strong>
+                <span>gender error, worst case (Stable Diffusion)</span>
+              </div>
+              <div class="stat">
+                <strong>30–38%</strong>
+                <span>age-bin error range across all three models</span>
+              </div>
+            </div>
+            <p>
+              The takeaway held up, sharper this time: even state-of-the-art
+              commercial generators carry substantial, unevenly distributed
+              demographic bias. Convenience doesn't buy fairness for free.
+            </p>
+
+            <h2>What I'd do next</h2>
+            <ol>
+              <li>Train an age estimator directly on the synthetic set to test whether fairness gains in the data translate to the downstream model.</li>
+              <li>Replace manual filtering with automated realism/quality scoring in the generation loop.</li>
+              <li>Extend the comparison to the ethnicities that failed hardest in both studies — Indigenous Australian, Hawaiian, Southeast Asian.</li>
+            </ol>
+
+            <h2>Links</h2>
+            <ul>
+              <li><a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">Modified AgeTransGAN repository</a></li>
+              <li>Yang et al. (2021). <em>AgeTransGAN for Facial Age Transformation.</em> IEEE TIFS, 16, 2030–2042.</li>
+              <li>Kärkkäinen &amp; Joo (2021). <em>FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age.</em> WACV.</li>
+            </ul>
           </div>
-          <div class="stat">
-            <strong>Privacy-first data</strong>
-            <span>Training faces that do not belong to real people</span>
-          </div>
+
+          <aside class="layout__rail">
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · Fairness</p>
+              <img src="../../assets/images/fairface-accuracy.png" alt="FairFace ethnicity classification accuracy by group, ranging from 1.00 for Indian to 0.34 for Southeast Asian" />
+              <p>Accuracy by ethnicity group — the bias didn't distribute evenly.</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · Age accuracy</p>
+              <img src="../../assets/images/insightface-age-accuracy.png" alt="InsightFace age-group accuracy showing a sharp drop for the 13-17 and 18-20 bins compared to adult bins" />
+              <p>The 13–20 bins fail hardest — the range that matters most for age verification.</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · Realism</p>
+              <img src="../../assets/images/fid-scores.png" alt="FID scores comparing the synthetic dataset to UTKFace and FairFace real-world datasets" />
+              <p>FID against two real-world benchmarks — moderate fidelity, room to improve.</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · Follow-up paper</p>
+              <img src="../../assets/images/t2i-comparison-error-rates.png" alt="FairFace prediction error rates across GPT-Image-1, Midjourney, and Stable Diffusion for ethnicity, gender, and age" />
+              <p>Same bias, different tool — commercial models included.</p>
+            </div>
+          </aside>
         </div>
-
-        <h2>The problem</h2>
-        <p>
-          Supervised age estimators need labelled faces at every point on the
-          lifespan. Collecting those photographs is expensive, ethically
-          fraught, and almost never balanced. Celebrity-heavy corpora over-
-          represent a narrow band of ethnicity, lighting, and age. The result
-          is familiar: mean absolute error looks acceptable in aggregate, then
-          collapses on the groups you care about most.
-        </p>
-        <p>
-          Synthetic data is an appealing workaround, but only if two things
-          hold at once. The generated face has to look the right age, and it
-          still has to look like the same person. Drift on either axis poisons
-          the label.
-        </p>
-
-        <figure class="figure">
-          <div
-            class="figure__frame"
-            role="img"
-            aria-label="Placeholder for the real-world age distribution chart"
-          >
-            <strong>Figure placeholder</strong>
-            <span>Age-group coverage: real benchmark vs. target mix</span>
-            <small>assets/images/age-distribution.png</small>
-          </div>
-          <figcaption>
-            Figure 1. Typical real-world age histograms leave children and
-            older adults under-sampled. Replace this frame with the
-            distribution chart from the dissertation.
-          </figcaption>
-        </figure>
-
-        <h2>Approach</h2>
-        <p>
-          Rather than train a single model to invent a person
-          <em>and</em> age them, I split the job. First, Stable Diffusion
-          produced a pool of synthetic identities. Then a modified
-          <a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">AgeTransGAN</a>
-          aged each identity into the target groups. Only after that did an
-          age estimator see the images.
-        </p>
-
-        <h3>1. Synthesise identities</h3>
-        <p>
-          Diffusion generated the base faces. Prompts and filters were used to
-          keep outputs on-distribution as faces — frontal enough to age, varied
-          enough not to collapse into one look — without photographing anyone.
-        </p>
-
-        <h3>2. Age the same person</h3>
-        <p>
-          AgeTransGAN (Hsu et al., ECCV 2022) is built for this second step:
-          an encoder–decoder generator with a conditional discriminator and an
-          embedded age classifier. Cycle consistency, age classification, and
-          cross-age identity loss try to pull age and identity apart. I adapted
-          the official model so it would accept the diffusion outputs rather
-          than the dataset it was originally trained against.
-        </p>
-
-        <h3>3. Estimate age</h3>
-        <p>
-          The estimator was trained and compared under a few data regimes:
-          real faces only, synthetic faces only, and mixed. The point was not
-          to claim a new architecture. It was to measure whether the synthetic
-          set was doing useful work — especially where real data is scarce.
-        </p>
-
-        <figure class="figure">
-          <div
-            class="figure__frame"
-            role="img"
-            aria-label="Placeholder for the generation pipeline diagram"
-          >
-            <strong>Figure placeholder</strong>
-            <span>Pipeline: prompt → diffusion → AgeTransGAN → estimator</span>
-            <small>assets/images/pipeline.png</small>
-          </div>
-          <figcaption>
-            Figure 2. End-to-end pipeline. Drop in the system diagram from the
-            dissertation.
-          </figcaption>
-        </figure>
-
-        <div class="callout">
-          <p>
-            Design constraint: age had to be controllable; identity had to
-            survive the edit. If either failed, the synthetic label was
-            noise.
-          </p>
-        </div>
-
-        <h2>What I looked at</h2>
-        <p>
-          Evaluation sat on two layers. Image quality and identity
-          preservation asked whether the generator was doing its job. Age error
-          asked whether the estimator actually learned from the result.
-        </p>
-        <ul>
-          <li>
-            <strong>Age fidelity</strong> — do transformed faces land in the
-            intended age group, checked by an independent estimator and by
-            inspection.
-          </li>
-          <li>
-            <strong>Identity preservation</strong> — does a face recogniser
-            still match the aged image to its source identity.
-          </li>
-          <li>
-            <strong>Downstream error</strong> — mean absolute error and
-            cumulative score on held-out real faces, broken down by age band.
-          </li>
-        </ul>
-
-        <div class="stats">
-          <div class="stat">
-            <strong>MAE · CS@k</strong>
-            <span>Standard age-estimation metrics, reported overall and by band</span>
-          </div>
-          <div class="stat">
-            <strong>Identity match</strong>
-            <span>A check that aging did not quietly swap the person</span>
-          </div>
-        </div>
-
-        <figure class="figure">
-          <div
-            class="figure__frame"
-            role="img"
-            aria-label="Placeholder for qualitative aging examples"
-          >
-            <strong>Figure placeholder</strong>
-            <span>Same synthetic identity, aged across target groups</span>
-            <small>assets/images/aging-grid.png</small>
-          </div>
-          <figcaption>
-            Figure 3. Qualitative grid: one identity walked across age groups.
-            Replace with the dissertation figure.
-          </figcaption>
-        </figure>
-
-        <h2>What the results showed</h2>
-        <p>
-          The useful story was in the breakdown, not the headline number.
-          Synthetic data was strongest as a complement: it thickened the sparse
-          age bands that real datasets under-represent. Used alone, it was more
-          brittle — generators leave texture artefacts, and an estimator can
-          learn those instead of aging.
-        </p>
-        <p>
-          Identity drift showed up most on the largest age jumps (child to
-          adult, adult to elderly). Those were exactly the transformations the
-          pipeline was meant to unlock, and exactly where the losses had to
-          work hardest. Mixing a modest amount of real data with the synthetic
-          set was the more stable training recipe.
-        </p>
-
-        <figure class="figure">
-          <div
-            class="figure__frame"
-            role="img"
-            aria-label="Placeholder for MAE by age group"
-          >
-            <strong>Figure placeholder</strong>
-            <span>MAE by age group: real / synthetic / mixed</span>
-            <small>assets/images/mae-by-age.png</small>
-          </div>
-          <figcaption>
-            Figure 4. Error by age band across training mixes. This is the
-            chart to swap in from the results chapter.
-          </figcaption>
-        </figure>
-
-        <h2>Trade-offs</h2>
-        <p>
-          Synthetic data does not remove bias; it relocates it. Diffusion
-          models and aging GANs both carry the demographics of their training
-          sets. If those generators under-represent a group, the estimator will
-          too — with the extra risk that the failure looks like a clean,
-          balanced dataset.
-        </p>
-        <p>
-          There is also a domain gap. A model can do well on synthetic faces
-          and still stumble on real cameras, compression, and pose. That is why
-          every claim in this project is anchored on real held-out images, not
-          on the generated test set.
-        </p>
-
-        <h2>What I would do next</h2>
-        <ol>
-          <li>
-            Tighten identity preservation on large age gaps, or reject
-            transformations that fail a verification threshold before they
-            enter training.
-          </li>
-          <li>
-            Audit the synthetic pool for demographic coverage instead of
-            assuming generation equals diversity.
-          </li>
-          <li>
-            Compare diffusion-native aging (editing in latent or prompt space)
-            against the two-stage GAN pipeline, on the same estimator.
-          </li>
-        </ol>
-
-        <h2>Links</h2>
-        <ul>
-          <li>
-            <a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">Modified AgeTransGAN repo</a>
-            — aging applied to Stable Diffusion faces
-          </li>
-          <li>
-            Hsu, G.-S., Xie, R.-C., Chen, Z.-T., &amp; Lin, Y.-H. (2022).
-            <em>AgeTransGAN for Facial Age Transformation with Rectified Performance Metrics.</em>
-            ECCV.
-          </li>
-        </ul>
       </article>
     </main>
 
