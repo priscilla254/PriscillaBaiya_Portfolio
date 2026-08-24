@@ -6,9 +6,10 @@
     <title>Priscilla Baiya — Portfolio</title>
     <meta
       name="description"
-      content="Portfolio of Priscilla Baiya, data scientist and MSc AI student. Case study on synthetic data for facial age estimation."
+      content="Portfolio of Priscilla Baiya, data scientist and MSc AI graduate. Case studies on biometric age estimation fairness and applied AI data pipelines."
     />
     <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/case-study.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -27,30 +28,52 @@
         <p class="eyebrow">Data scientist · MSc Artificial Intelligence</p>
         <h1>Priscilla Baiya</h1>
         <p class="lede">
-          I build machine learning systems, with a focus on biometric age
-          estimation and whether synthetic faces can stand in for real ones,
-          fairly.
+          I build machine learning systems and data pipelines, with a focus
+          on biometric age estimation and whether synthetic faces can stand
+          in for real ones, fairly.
         </p>
       </section>
 
       <section class="section" id="work">
         <h2>Selected work</h2>
+
+        <div class="work-grid">
         <a class="card" href="case-studies/synthetic-age-estimation/">
           <div>
             <p class="card__meta">
               <span class="tag">Case study</span>
               <span class="tag">Biometric age estimation</span>
-              <span class="tag">Fairness</span>
+              <span class="tag">MSc dissertation</span>
             </p>
             <h3>Synthetic age estimation</h3>
             <p>
-              A three-stage pipeline — SDXL, AgeTransGAN, CodeFormer — for a
-              demographically balanced synthetic dataset, evaluated for
-              fairness, age accuracy, and realism.
+              A three-stage generative pipeline for a demographically
+              diverse synthetic dataset — evaluated for fairness, accuracy,
+              and realism, then stress-tested against commercial
+              text-to-image models.
             </p>
             <p class="card__cta">Read the case study →</p>
           </div>
         </a>
+
+        <a class="card" href="case-studies/construction-cost-benchmarking/">
+          <div>
+            <p class="card__meta">
+              <span class="tag">Case study</span>
+              <span class="tag">Data engineering</span>
+              <span class="tag">Applied AI</span>
+            </p>
+            <h3>Construction cost benchmarking pipeline</h3>
+            <p>
+              An ETL pipeline and AI query layer — Excel ingestion with
+              validation, a SQL Server warehouse, embedded BI dashboards,
+              and a Groq-powered assistant for natural-language cost
+              questions, with hard guardrails against unsafe queries.
+            </p>
+            <p class="card__cta">Read the case study →</p>
+          </div>
+        </a>
+        </div>
       </section>
     </main>
 

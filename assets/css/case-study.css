@@ -113,7 +113,6 @@
 .pipeline svg {
   width: 100%;
   height: auto;
-  aspect-ratio: 900 / 260;
   display: block;
 }
 
@@ -182,4 +181,17 @@ body > .site-footer {
   position: relative;
   z-index: 2;
   background: var(--paper);
+}
+
+/* Homepage: side-by-side project cards */
+.work-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
 }

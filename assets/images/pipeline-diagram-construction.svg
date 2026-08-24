@@ -1,0 +1,50 @@
+<svg viewBox="0 0 900 420" width="900" height="420" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans, system-ui, sans-serif">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#245c48" />
+    </marker>
+  </defs>
+
+  <rect width="900" height="420" fill="#f4f1ea" />
+
+  <rect x="20" y="30" width="220" height="110" rx="14" fill="#fffcf7" stroke="#ddd6c8" stroke-width="1.5" />
+  <text x="130" y="58" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#5c574f">INGEST</text>
+  <text x="130" y="84" text-anchor="middle" font-size="18" font-weight="600" fill="#1b1916">Excel upload</text>
+  <text x="130" y="106" text-anchor="middle" font-size="12" fill="#5c574f">Validation + batch</text>
+  <text x="130" y="122" text-anchor="middle" font-size="12" fill="#5c574f">tracking per load</text>
+
+  <line x1="240" y1="85" x2="300" y2="85" stroke="#245c48" stroke-width="2" marker-end="url(#arrow2)" />
+
+  <rect x="305" y="30" width="220" height="110" rx="14" fill="#fffcf7" stroke="#ddd6c8" stroke-width="1.5" />
+  <text x="415" y="58" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#5c574f">STORE</text>
+  <text x="415" y="84" text-anchor="middle" font-size="18" font-weight="600" fill="#1b1916">SQL Server</text>
+  <text x="415" y="106" text-anchor="middle" font-size="12" fill="#5c574f">Curated benchmark</text>
+  <text x="415" y="122" text-anchor="middle" font-size="12" fill="#5c574f">tables + BI views</text>
+
+  <line x1="415" y1="140" x2="415" y2="180" stroke="#245c48" stroke-width="2" />
+  <line x1="415" y1="180" x2="185" y2="180" stroke="#245c48" stroke-width="2" />
+  <line x1="415" y1="180" x2="645" y2="180" stroke="#245c48" stroke-width="2" />
+  <line x1="185" y1="180" x2="185" y2="210" stroke="#245c48" stroke-width="2" marker-end="url(#arrow2)" />
+  <line x1="645" y1="180" x2="645" y2="210" stroke="#245c48" stroke-width="2" marker-end="url(#arrow2)" />
+
+  <rect x="70" y="215" width="230" height="110" rx="14" fill="#fffcf7" stroke="#ddd6c8" stroke-width="1.5" />
+  <text x="185" y="243" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#5c574f">QUERY</text>
+  <text x="185" y="269" text-anchor="middle" font-size="18" font-weight="600" fill="#1b1916">Groq AI assistant</text>
+  <text x="185" y="291" text-anchor="middle" font-size="12" fill="#5c574f">Natural language ’ SQL</text>
+  <text x="185" y="307" text-anchor="middle" font-size="12" fill="#5c574f">read-only, single SELECT</text>
+
+  <rect x="530" y="215" width="230" height="110" rx="14" fill="#fffcf7" stroke="#ddd6c8" stroke-width="1.5" />
+  <text x="645" y="243" text-anchor="middle" font-size="12" letter-spacing="1.5" fill="#5c574f">VISUALIZE</text>
+  <text x="645" y="269" text-anchor="middle" font-size="18" font-weight="600" fill="#1b1916">Superset BI</text>
+  <text x="645" y="291" text-anchor="middle" font-size="12" fill="#5c574f">Embedded dashboards,</text>
+  <text x="645" y="307" text-anchor="middle" font-size="12" fill="#5c574f">dockerized sidecar</text>
+
+  <line x1="185" y1="325" x2="185" y2="355" stroke="#245c48" stroke-width="2" />
+  <line x1="645" y1="325" x2="645" y2="355" stroke="#245c48" stroke-width="2" />
+  <line x1="185" y1="355" x2="645" y2="355" stroke="#245c48" stroke-width="2" />
+  <line x1="415" y1="355" x2="415" y2="375" stroke="#245c48" stroke-width="2" marker-end="url(#arrow2)" />
+
+  <text x="415" y="405" text-anchor="middle" font-size="13" fill="#245c48" font-weight="600">
+    React frontend  ingestion status, AI Q&amp;A, embedded analytics
+  </text>
+</svg>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Construction cost benchmarking pipeline — Priscilla Baiya</title>
+    <meta
+      name="description"
+      content="Case study: an ETL pipeline and AI query layer for construction cost benchmarking — Excel ingestion, SQL Server, a Groq-powered natural language SQL assistant, and embedded Superset dashboards."
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/case-study.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="wordmark" href="../../">Priscilla Baiya</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="../../#work">Work</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </nav>
+    </header>
+
+    <main id="main" class="article-wrap article-wrap--wide">
+      <a class="back" href="../../">← Home</a>
+
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">Case study · Data engineering · Applied AI</p>
+          <h1>Turning messy Excel benchmarks into a queryable pipeline</h1>
+          <p class="lede">
+            An ETL pipeline for construction cost benchmarking — Excel
+            ingestion with validation, a SQL Server warehouse, embedded BI
+            dashboards, and a Groq-powered assistant that answers cost
+            questions in plain English instead of SQL.
+          </p>
+          <p class="meta">
+            Placement year · Proof of concept, built solo
+          </p>
+        </header>
+
+        <div class="glance">
+          <div class="glance__item">
+            <strong>9 endpoints</strong>
+            <span>FastAPI backend covering ingestion, validation, AI, and BI</span>
+          </div>
+          <div class="glance__item">
+            <strong>2 Groq features</strong>
+            <span>read-only NL-to-SQL, and fact-grounded report drafting</span>
+          </div>
+          <div class="glance__item">
+            <strong>Batch-tracked</strong>
+            <span>every upload validated, errored rows downloadable as CSV</span>
+          </div>
+          <div class="glance__item">
+            <strong>Dockerized BI</strong>
+            <span>Superset dashboards embedded via guest token, not iframed blind</span>
+          </div>
+        </div>
+
+        <p>
+          Construction cost benchmarking runs on spreadsheets — every
+          project lands as its own Excel workbook, with its own quirks and
+          its own errors. Comparing costs across projects meant someone
+          manually reconciling that mess by hand. This project asked: what
+          would it take to turn that into a proper pipeline — one where an
+          upload gets validated automatically, lands in a real database, and
+          can be queried by anyone on the team, not just whoever knows SQL?
+        </p>
+
+        <div class="layout">
+          <div class="layout__main">
+            <h2>The problem</h2>
+            <p>
+              Two separate audiences needed the same underlying data.
+              Analysts wanted to slice cost data by project, sector, and
+              cost element — the kind of thing a BI dashboard handles well.
+              But non-technical stakeholders just wanted answers to direct
+              questions — "what's the average cost per m² for this sector?"
+              — without learning SQL or waiting on someone else to run a
+              query. Building for only one of those audiences would have
+              left the other exactly where they started.
+            </p>
+
+            <h2>Approach</h2>
+            <p>
+              The pipeline separates ingestion, storage, and consumption
+              into distinct stages, so the AI layer and the BI layer both
+              read from the same validated source of truth rather than
+              from the raw spreadsheets directly.
+            </p>
+
+            <div class="pipeline">
+              <img src="../../assets/images/pipeline-diagram-construction.svg" width="900" height="420" alt="Architecture diagram: Excel upload is validated and batch-tracked, lands in SQL Server, then is consumed two ways — a Groq-powered natural language SQL assistant, and embedded Superset BI dashboards — both surfaced in a React frontend." />
+            </div>
+            <p class="pipeline-note">
+              Full backend, ingestion engine, and Superset config are in
+              <a href="https://github.com/priscilla254/construction-data-benchmarking-pipeline" rel="noopener noreferrer">the repo</a>.
+            </p>
+
+            <h2>Two AI features, two different guardrail problems</h2>
+            <p>
+              The natural-language query assistant takes a question like
+              <em>"Show top 10 Level2 elements by total cost"</em>, uses
+              Groq to generate the corresponding SQL, and returns both the
+              query and the result — so the answer is always auditable, not
+              a black box. Because this sits in front of a real database,
+              the endpoint enforces hard guardrails: single-statement
+              queries only, must start with <code>SELECT</code>, and any
+              mutating or DDL keyword (<code>INSERT</code>,
+              <code>UPDATE</code>, <code>DELETE</code>, <code>DROP</code>)
+              is blocked outright before execution.
+            </p>
+            <p>
+              The report-drafting service solves a different problem:
+              generating client-facing tender report narrative — an
+              executive summary, commercial analysis, and next steps —
+              without letting the model invent figures. Every number in the
+              output comes from a "deterministic facts" object built
+              directly from the database (tender sums, adjustments, budget
+              totals); Groq (<code>llama-3.3-70b-versatile</code>) only
+              writes the surrounding prose, under an explicit instruction
+              not to alter or invent any value, and not to reference the
+              database, AI, or internal IDs in the client-facing text. If
+              the Groq call fails for any reason, the service falls back to
+              a deterministic templated paragraph built from the same facts
+              — the report still generates, just without the polish.
+            </p>
+
+            <h2>Why Superset runs as a separate service</h2>
+            <p>
+              Rather than bolt BI logic into the FastAPI app, Superset runs
+              as its own dockerized sidecar — avoiding dependency conflicts
+              with the backend's own environment, and keeping BI runtime
+              concerns (caching, worker processes, metadata storage) out of
+              application code entirely. Dashboards are embedded into the
+              React frontend via a guest-token endpoint rather than a raw
+              iframe, and the SQL Server login backing them is scoped to
+              read-only access.
+            </p>
+
+            <h2>What I'd do next</h2>
+            <ol>
+              <li>Extend the ingestion engine beyond Excel — CSV and direct database imports, so the pipeline isn't tied to one file format.</li>
+              <li>Add automated tests around the AI SQL guardrails specifically, since that's the highest-risk surface in the system.</li>
+              <li>Move the AI report-draft endpoint from returning structured context to generating full narrative reports, closer to what a project manager would actually read.</li>
+            </ol>
+
+            <h2>Links</h2>
+            <ul>
+              <li><a href="https://github.com/priscilla254/construction-data-benchmarking-pipeline" rel="noopener noreferrer">Repository — backend, ingestion engine, Superset config</a></li>
+            </ul>
+          </div>
+
+          <aside class="layout__rail">
+            <div class="rail-card">
+              <p class="rail-card__label">Stack</p>
+              <p>FastAPI (Python) · React + TypeScript (Vite) · SQL Server · Groq API · Apache Superset · Docker</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Backend surface</p>
+              <p>
+                Upload &amp; validate → batch summary, error counts, error
+                detail, CSV export → AI query → AI report draft → Superset
+                guest token. Nine endpoints, one consistent batch model
+                running through all of them.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Guardrail · Query</p>
+              <p>
+                The AI query endpoint rejects anything that isn't a single
+                <code>SELECT</code> statement — <code>INSERT</code>,
+                <code>UPDATE</code>, <code>DELETE</code>, and
+                <code>DROP</code> are blocked before they ever reach the
+                database.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Guardrail · Report drafting</p>
+              <p>
+                Numbers come only from a facts object built from the
+                database — the model is explicitly instructed never to
+                invent or alter a figure, and falls back to a templated
+                paragraph if the Groq call fails at all.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Why this matters</p>
+              <p>
+                Same underlying pattern as the age-estimation work: take
+                something that produces a plausible-looking answer, and
+                make sure it can't quietly do damage — bias in a model,
+                or an unchecked write in a database.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="../../">← Back to home</a></p>
+      <p class="footer-links">
+        <a href="mailto:priscillawambui8@gmail.com">Email</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </p>
+    </footer>
+  </body>
+</html>
