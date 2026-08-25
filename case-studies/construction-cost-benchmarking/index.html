@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Applied AI for construction cost benchmarking</title>
+    <title>Applied AI for Construction costs — Priscilla Baiya</title>
     <meta
       name="description"
-      content="Case study: a self-authored research proposal and proof of concept for a construction consultancy that runs cost benchmarking through spreadsheets
-       — making the case for a centralised cost database, with a Power BI dashboard for visual analysis and a Groq-powered AI layer."
+      content="Case study: a research proposal and proof of concept for a quantity surveying consultancy — a centralised cost database, Power BI benchmarking dashboards, and a Groq-powered AI layer for querying and report drafting."
     />
     <link rel="stylesheet" href="../../assets/css/style.css" />
     <link rel="stylesheet" href="../../assets/css/case-study.css" />
@@ -34,18 +33,18 @@
       <article>
         <header class="article-header">
           <p class="eyebrow">Research proposal · Applied AI · Data strategy</p>
-          <h1>Applied AI for construction cost benchmarking</h1>
+          <h1>Applied AI for Construction costs</h1>
           <p class="lede">
-            <p>
-              Costplan is a quantity surveying consultancy where project cost data
-              lived in individual Excel workbooks, one per project. Comparing
-              costs across projects meant manually reconciling different
-              spreadsheets, relying on memory and experience, and with no formal
-              database, benchmarking new estimates against past projects was done
-              the same way.
-            </p>
+            Costplan is a quantity surveying consultancy where project cost data
+            lived in individual Excel workbooks, one per project. Comparing
+            costs across projects meant manually reconciling different
+            spreadsheets, relying on memory and experience, and with no formal
+            database, benchmarking new estimates against past projects was done
+            the same way.
           </p>
-     
+          <p class="meta">
+            Placement year, Costplan Services · Research proposal → proof of concept
+          </p>
         </header>
 
         <div class="pipeline-flow">
@@ -75,19 +74,17 @@
           </div>
         </div>
 
-        
-   
-
         <div class="layout">
           <div class="layout__main">
             <h2>What centralised data could unlock</h2>
             <p>
               Once the data problem was clear, the real question was what
               centralising it would actually enable. I pitched the company's
-              directors on three distinct capabilities which the prototype showed: Power BI dashboards for
-              benchmarking projects against each other, a natural-language layer
-              for querying the data directly through a chat interface, and automated
-              drafting for client reports as the structure of the report is defined and this task was only repetitive and time-consuming.
+              directors on three capabilities the prototype then showed: Power BI
+              dashboards for benchmarking projects against each other, a
+              natural-language layer for querying the data through a chat
+              interface, and automated drafting for client reports — the same
+              defined structure, rebuilt by hand, every time.
             </p>
 
             <h2>The data model</h2>
@@ -108,7 +105,9 @@
               and inflation indices are published by governing bodies too, so a
               ten-year-old project's costs can still be adjusted and compared
               fairly against a new one. Most of that historical data was sitting
-              unused simply because nothing connected it together. My research was aimed at fixing this.            </p>
+              unused simply because nothing connected it together. My research
+              was aimed at fixing this.
+            </p>
 
             <div class="pipeline">
               <img src="../../assets/images/schema-diagram.svg" width="1000" height="640" alt="Star schema diagram: fact_elemental_costs sits at the centre, connected to fact_projects, fact_cost_sets, fact_preliminaries, dim_elements, dim_sectors, dim_locations, and dim_cost_stages." />
@@ -152,7 +151,7 @@
               was signed off, with a budget approved to build it out properly.
             </p>
 
-            <h2>What's next</h2>
+            <h2>What I'd do next</h2>
             <ol>
               <li>Take the pipeline from proof of concept to production, with proper monitoring and alerting around pipeline runs.</li>
               <li>Add automated tests around the AI SQL guardrails specifically, since that's the highest-risk surface in the system.</li>
@@ -161,7 +160,7 @@
 
             <h2>Links</h2>
             <ul>
-              <li><a href="https://github.com/priscilla254/construction-data-benchmarking-pipeline" rel="noopener noreferrer">Repository — backend, ingestion engine, schema, Superset config</a></li>
+              <li><a href="https://github.com/priscilla254/construction-data-benchmarking-pipeline" rel="noopener noreferrer">Repository — backend, ingestion engine, and schema</a></li>
             </ul>
           </div>
 

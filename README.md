@@ -1,8 +1,11 @@
 # Priscilla Baiya — Portfolio
 
-Static site for selected work. No build step, no framework — semantic HTML and a single stylesheet.
+Static site for selected work. No build step, no framework — semantic HTML and shared stylesheets.
 
-The first case study covers an MSc dissertation on **synthetic facial age estimation**: a three-stage pipeline (SDXL → AgeTransGAN → CodeFormer) for a demographically balanced dataset, with a fairness and bias evaluation and a follow-up comparison of text-to-image models.
+Two case studies:
+
+- **Synthetic facial age estimation** — an MSc dissertation: a three-stage pipeline (SDXL → AgeTransGAN → CodeFormer) for a demographically balanced dataset, with a fairness evaluation and a follow-up comparison of text-to-image models.
+- **Applied AI for Construction costs** — a placement-year research proposal and proof of concept: a centralised cost database, Power BI dashboards, and a Groq-powered AI layer for querying and report drafting.
 
 ## Local preview
 
@@ -17,7 +20,9 @@ npx serve .
 ```
 ├── index.html
 ├── case-studies/
-│   └── synthetic-age-estimation/
+│   ├── synthetic-age-estimation/
+│   │   └── index.html
+│   └── construction-cost-benchmarking/
 │       └── index.html
 ├── assets/
 │   ├── css/
@@ -27,8 +32,6 @@ npx serve .
 └── README.md
 ```
 
-Optional charts and figures can go in `assets/images/`.
-
 ## Deploy
 
-The folder is ready for [Vercel](https://vercel.com), Netlify, or GitHub Pages. Nested `index.html` files already map to clean URLs (`/`, `/case-studies/synthetic-age-estimation/`). Custom `vercel.json` routing is not required.
+The folder is ready for [Vercel](https://vercel.com), Netlify, or GitHub Pages. Nested `index.html` files already map to clean URLs (`/`, `/case-studies/synthetic-age-estimation/`, `/case-studies/construction-cost-benchmarking/`). Custom `vercel.json` routing is not required.
