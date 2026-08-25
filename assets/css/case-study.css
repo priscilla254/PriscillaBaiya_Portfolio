@@ -125,9 +125,9 @@
 .layout > .layout__rail {
   min-width: 0;
   position: sticky;
-  top: 1.5rem;
+  top: 4.25rem;
   align-self: start;
-  max-height: calc(100vh - 3rem);
+  max-height: calc(100vh - 5.75rem);
   overflow-y: auto;
   display: grid;
   gap: 1.25rem;
