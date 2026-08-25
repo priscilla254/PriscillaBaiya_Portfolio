@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Making the case for a centralised cost database — Priscilla Baiya</title>
+    <title>Applied AI for construction cost benchmarking</title>
     <meta
       name="description"
-      content="Case study: a self-authored research proposal and proof of concept for a traditional construction consultancy — making the case for a centralised cost database, with a Power BI vs. Superset trade-off and a Groq-powered AI layer."
+      content="Case study: a self-authored research proposal and proof of concept for a construction consultancy that runs cost benchmarking through spreadsheets
+       — making the case for a centralised cost database, with a Power BI dashboard for visual analysis and a Groq-powered AI layer."
     />
     <link rel="stylesheet" href="../../assets/css/style.css" />
     <link rel="stylesheet" href="../../assets/css/case-study.css" />
@@ -33,85 +34,81 @@
       <article>
         <header class="article-header">
           <p class="eyebrow">Research proposal · Applied AI · Data strategy</p>
-          <h1>Making the case for a centralised cost database</h1>
+          <h1>Applied AI for construction cost benchmarking</h1>
           <p class="lede">
-            A self-authored proposal and proof of concept for a traditional
-            construction consultancy still running cost benchmarking through
-            spreadsheets — arguing for, then building, a centralised
-            database, and testing whether a free BI tool could avoid an
-            ongoing licensing cost.
+            <p>
+              Costplan is a quantity surveying consultancy where project cost data
+              lived in individual Excel workbooks, one per project. Comparing
+              costs across projects meant manually reconciling different
+              spreadsheets, relying on memory and experience, and with no formal
+              database, benchmarking new estimates against past projects was done
+              the same way.
+            </p>
           </p>
-          <p class="meta">
-            Placement year, Costplan Services · Research proposal → proof of concept, built solo
-          </p>
+     
         </header>
 
-        <div class="glance">
-          <div class="glance__item">
-            <strong>$735.91/mo</strong>
-            <span>Power BI embed cost that sent us looking for an alternative</span>
+        <div class="pipeline-flow">
+          <div class="pipeline-flow__step">
+            <strong>Standardised Excel</strong>
+            <span>Structured input templates, replacing free-form spreadsheets</span>
           </div>
-          <div class="glance__item">
-            <strong>Superset: dropped</strong>
-            <span>free and self-hosted, but dashboard quality didn't hold up</span>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>ETL</strong>
+            <span>Clean, validate, and map into the schema</span>
           </div>
-          <div class="glance__item">
-            <strong>2 AI features</strong>
-            <span>read-only NL-to-SQL, and fact-grounded report drafting</span>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Database</strong>
+            <span>Centralised, queryable, benchmarkable</span>
           </div>
-          <div class="glance__item">
-            <strong>Signed off</strong>
-            <span>presented to all three directors; phase 2 (AI layer) now approved</span>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Power BI</strong>
+            <span>Benchmarking dashboards for the team</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step pipeline-flow__step--accent">
+            <strong>Applied AI</strong>
+            <span>NL-to-SQL query assistant, fact-grounded report drafting</span>
           </div>
         </div>
 
-        <p>
-          Costplan is a quantity surveying consultancy — the kind of
-          traditional, relationship-driven firm where decades of project
-          cost data live in individual Excel workbooks, one per project,
-          each with its own quirks. Comparing costs across projects meant
-          someone manually reconciling that mess by hand. There was no
-          formal database, no servers, and no existing appetite for one —
-          which meant the real first task wasn't technical. It was making
-          the case that centralising this data was worth doing at all.
-        </p>
+        
+   
 
         <div class="layout">
           <div class="layout__main">
-            <h2>Starting with a proposal, not a build</h2>
+            <h2>What centralised data could unlock</h2>
             <p>
-              Rather than being handed a spec, I wrote a <em>reverse
-              brief</em> — a self-authored proposal to the company's
-              directors, structured the way a consultancy would present to
-              a client: problem statement, objectives, scope, approach,
-              deliverables. The first version proposed a master Excel
-              template, a Python cleaning script, and Power BI dashboards on
-              top, with a proper database scoped in as a longer-term
-              deliverable.
-            </p>
-            <p>
-              The directors' feedback reshaped the whole direction. Power
-              BI, they pointed out, only added real value for
-              <strong>benchmarking</strong> — comparing costs across many
-              past projects — not for day-to-day tender analysis, where QSs
-              were already comfortable working in Excel and a dashboard
-              added nothing they didn't already have. That pushback is what
-              narrowed the scope correctly: the database wasn't there to
-              replace how QSs already worked, it was there to make
-              benchmarking possible at all, since without structured data
-              that goal was going nowhere.
+              Once the data problem was clear, the real question was what
+              centralising it would actually enable. I pitched the company's
+              directors on three distinct capabilities which the prototype showed: Power BI dashboards for
+              benchmarking projects against each other, a natural-language layer
+              for querying the data directly through a chat interface, and automated
+              drafting for client reports as the structure of the report is defined and this task was only repetitive and time-consuming.
             </p>
 
             <h2>The data model</h2>
             <p>
-              Construction cost data has real structure once you look past
-              the spreadsheets: every cost belongs to a project, a specific
-              cost stage (concept, tender, final account), and traces down
-              through increasingly granular levels — from elemental totals
-              (<em>"the frame cost £800k"</em>) to standardised components
-              (<em>"which is broken into steel, concrete, decking..."</em>).
-              That structure became a star schema.
+              Construction cost data has real structure once you look past the
+              spreadsheets. Costs break down into three levels. Level 1 is the
+              top-line summary — "the frame cost £800k." Level 2 breaks that down
+              into standardised elements (steel, concrete, decking), following a
+              structure regulated by an industry body so that every contractor
+              prices projects the same way, which is what makes comparison across
+              projects possible at all. Level 3 goes further still, down to
+              individual components within an element, like the layers of paint on
+              a wall. Each level rolls up into the one above it: Level 3 into
+              Level 2, Level 2 into Level 1.
             </p>
+            <p>
+              That structure is also what makes old data worth keeping. Location
+              and inflation indices are published by governing bodies too, so a
+              ten-year-old project's costs can still be adjusted and compared
+              fairly against a new one. Most of that historical data was sitting
+              unused simply because nothing connected it together. My research was aimed at fixing this.            </p>
 
             <div class="pipeline">
               <img src="../../assets/images/schema-diagram.svg" width="1000" height="640" alt="Star schema diagram: fact_elemental_costs sits at the centre, connected to fact_projects, fact_cost_sets, fact_preliminaries, dim_elements, dim_sectors, dim_locations, and dim_cost_stages." />
@@ -125,71 +122,41 @@
             <h2>The AI layer</h2>
             <p>
               Report drafting for clients was manual and repetitive — the same
-              structure, rebuilt by hand, for every project. Once the database
-              existed, that became solvable properly instead of just faster: two
-              Groq-powered features, each with its own guardrail problem to solve.
+              structure, rebuilt by hand, for every project. I prototyped two
+              Groq-powered features to explore whether that could be solved
+              properly rather than just sped up, each with its own guardrail
+              problem to work through.
             </p>
             <p>
-              A natural-language query assistant lets a QS ask <em>"Show top 10
-              Level2 elements by total cost"</em> and get back generated SQL plus
-              results — read-only, single-<code>SELECT</code>-only, with any
+              The query assistant takes a question like <em>"Show top 10 Level2
+              elements by total cost"</em> and returns generated SQL plus results —
+              restricted to read-only, single-<code>SELECT</code> queries, with any
               mutating or DDL keyword blocked outright before execution.
             </p>
             <p>
-              A report-drafting service generates the client-facing tender report
-              narrative itself — executive summary, commercial analysis, next
-              steps — while keeping every number locked to a "deterministic
+              The report-drafting prototype generates the client-facing tender
+              report narrative itself — executive summary, commercial analysis,
+              next steps — while keeping every number locked to a "deterministic
               facts" object built directly from the database. Groq only writes the
               surrounding prose, explicitly instructed never to alter or invent a
               figure, with a templated fallback if the API call fails outright.
-              The aim throughout was cutting the time spent on repetitive report
-              writing without ever letting the model touch the actual numbers.
-            </p>
-
-            <h2>The Power BI vs. Superset trade-off</h2>
-            <p>
-              Once the pipeline reached the point of embedding dashboards
-              into a web app, Power BI's own embed pricing came out at
-              roughly <strong>$735.91/month</strong> — too expensive to
-              justify at this stage of the project for a company this size.
-              That cost problem is what triggered a trial of
-              <strong>Apache Superset</strong>, an open-source,
-              self-hostable BI tool, as a free alternative.
-            </p>
-            <p>
-              I built it properly, not as a throwaway test: Superset ran as
-              its own Dockerized sidecar service, with curated read-only BI
-              views in SQL Server, and dashboards embedded into the React
-              frontend via guest tokens rather than a raw iframe. On cost alone,
-              it was a clear win.
-            </p>
-            <p>
-              It didn't solve the actual problem. Once embedded and running
-              against real data, Superset's dashboard quality and
-              visualisation capability simply didn't hold up against Power
-              BI — the charts, interactivity, and polish were a clear step
-              down. <strong>Verdict: abandoned.</strong> Power BI remained
-              the preferred tool for the actual benchmarking output, cost
-              included, and the Superset work was folded into the proposal
-              as evidence the alternative had been properly tested rather
-              than dismissed on assumption.
+              The point was testing whether the model could be trusted with the
+              writing without ever being trusted with the numbers.
             </p>
 
             <h2>Where this landed</h2>
             <p>
-              I presented the full proof of concept to all three company
-              directors, split into two phases: Phase 1, the database and
-              Power BI benchmarking dashboards; Phase 2, extending it with
-              a natural-language layer on top of the data using Azure
-              OpenAI. It was signed off, with a delivery timeline and a
-              budget approved for the tooling to build it properly.
+              I presented the proof of concept to all three company directors,
+              split into two phases: Phase 1 covering the database and Power BI
+              benchmarking dashboards, Phase 2 extending it with the AI layer. It
+              was signed off, with a budget approved to build it out properly.
             </p>
 
-            <h2>What I'd do next</h2>
+            <h2>What's next</h2>
             <ol>
-              <li>Build out the SSIS or Python-based automation for the ingestion pipeline, rather than the current manual-trigger PoC.</li>
+              <li>Take the pipeline from proof of concept to production, with proper monitoring and alerting around pipeline runs.</li>
               <li>Add automated tests around the AI SQL guardrails specifically, since that's the highest-risk surface in the system.</li>
-              <li>Extend the elemental breakdown to Level 3 (assembly/product) once enough projects are in the system to make that granularity useful rather than sparse.</li>
+              <li>Extend the AI layer with RAG, grounding the query assistant and report drafting in a wider set of project documents, not just the structured database fields.</li>
             </ol>
 
             <h2>Links</h2>
@@ -200,20 +167,11 @@
 
           <aside class="layout__rail">
             <div class="rail-card">
-              <p class="rail-card__label">Backstory</p>
+              <p class="rail-card__label">Power BI vs. Superset</p>
               <p>
-                Started as a self-authored proposal to directors, not a
-                spec handed down — the scope changed twice based on their
-                pushback before any code was written.
-              </p>
-            </div>
-
-            <div class="rail-card">
-              <p class="rail-card__label">The trade-off</p>
-              <p>
-                Superset: free, self-hosted, solved the $735.91/mo cost
-                problem — but dashboard quality lost to Power BI once
-                properly tested. Abandoned despite the cost win.
+                Power BI's embed pricing wasn't viable for a company this size,
+                so I tested Apache Superset as a free alternative. Dropped once
+                dashboard quality didn't hold up.
               </p>
             </div>
 
@@ -228,16 +186,6 @@
                 Query assistant: single <code>SELECT</code> only, DDL
                 blocked. Report drafting: numbers locked to
                 database-sourced facts, model can't invent figures.
-              </p>
-            </div>
-
-            <div class="rail-card">
-              <p class="rail-card__label">Why this matters</p>
-              <p>
-                Same underlying instinct as the age-estimation work:
-                test the plausible-sounding alternative properly before
-                trusting it, and make sure nothing downstream can quietly
-                do damage.
               </p>
             </div>
           </aside>

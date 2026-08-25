@@ -36,5 +36,5 @@
 <text x="316" y="145" text-anchor="middle" font-size="15" font-weight="600" fill="#1b1916">dim_cost_stages</text>
 <text x="316" y="165" text-anchor="middle" font-size="11.5" fill="#5c574f">Concept, Tender,</text>
 <text x="316" y="180" text-anchor="middle" font-size="11.5" fill="#5c574f">Final Account</text>
-<text x="500" y="615" text-anchor="middle" font-size="13" fill="#245c48" font-weight="600">Star schema  every element cost traces back to a project, a cost stage, and a standardised element code</text>
+<text x="500" y="615" text-anchor="middle" font-size="13" fill="#245c48" font-weight="600">Star schema — every element cost traces back to a project, a cost stage, and a standardised element code</text>
 </svg>
