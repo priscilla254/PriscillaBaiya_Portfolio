@@ -25,17 +25,20 @@
     </header>
 
     <main id="main" class="article-wrap article-wrap--wide">
-      <a class="back" href="../../">← Home</a>
+      <div class="page-nav">
+        <a class="back" href="../../">← Home</a>
+        <a class="back" href="../construction-cost-benchmarking/">Next case study →</a>
+      </div>
 
       <article>
         <header class="article-header">
           <p class="eyebrow">Case study · Biometric age estimation · Fairness</p>
           <h1>Can synthetic faces train a fairer age estimator?</h1>
           <p class="lede">
-            A generative pipeline for a demographically balanced,
-            privacy-conscious dataset for facial age estimation —
-            evaluated for fairness, accuracy, and realism, then stress-tested
-            against commercial text-to-image models.
+            A generative pipeline for a demographically balanced, privacy-conscious dataset for facial age estimation,
+             evaluated for fairness, accuracy, and realism, 
+             then extended to test whether better base images could improve the results.
+       
           </p>
           <p class="meta">
             MSc Computer Science (Artificial Intelligence) · University of Kent
@@ -77,7 +80,7 @@
           <div class="layout__main">
             <h2>The problem</h2>
             <p>
-              Two forces compound the data problem. First, demographic bias:
+              We have two separate issues here. First, demographic bias:
               UTKFace, a standard benchmark, is 45.5% Caucasian, and models
               trained on skewed data under-perform on the groups they're
               meant to protect. Second, the UK's Online Safety Act (2025)
@@ -88,7 +91,7 @@
 
             <h2>Approach</h2>
             <p>
-              Three deliberate stages, each handling one job: generate a
+              Three deliberate stages: generate a
               diverse identity, age it convincingly, then restore artefacts
               introduced along the way.
             </p>
@@ -118,9 +121,8 @@
               and 3 of the 18–20 images, with most pushed into older bins —
               a systematic overestimation of minors' ages, which is exactly
               the failure mode an age-verification system can't afford.
-              Interestingly, human evaluators found these same younger
-              images convincing — the automated model and human judgement
-              were catching different problems entirely.
+              Interestingly, human evaluators still found these younger images convincing, even 
+              though the automated model got the age wrong.
             </p>
 
             <h2>Follow-up: do off-the-shelf tools do any better?</h2>
@@ -171,6 +173,7 @@
             <h2>Links</h2>
             <ul>
               <li><a href="https://github.com/priscilla254/AgeTransGAN_myedit" rel="noopener noreferrer">Modified AgeTransGAN repository</a></li>
+              <li><a href="https://github.com/priscilla254/model-comparisons-age-verification" rel="noopener noreferrer">Model comparisons for age verification</a> — follow-up text-to-image evaluation</li>
               <li>Yang et al. (2021). <em>AgeTransGAN for Facial Age Transformation.</em> IEEE TIFS, 16, 2030–2042.</li>
               <li>Kärkkäinen &amp; Joo (2021). <em>FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age.</em> WACV.</li>
             </ul>
@@ -203,6 +206,13 @@
           </aside>
         </div>
       </article>
+
+      <nav class="pager" aria-label="More case studies">
+        <a class="pager__link" href="../construction-cost-benchmarking/">
+          <span class="pager__label">Next case study</span>
+          <span class="pager__title">Making the case for a centralised cost database</span>
+        </a>
+      </nav>
     </main>
 
     <footer class="site-footer">

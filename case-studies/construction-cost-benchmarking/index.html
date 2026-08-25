@@ -25,11 +25,14 @@
     </header>
 
     <main id="main" class="article-wrap article-wrap--wide">
-      <a class="back" href="../../">← Home</a>
+      <div class="page-nav">
+        <a class="back" href="../../">← Home</a>
+        <a class="back" href="../synthetic-age-estimation/">← Previous case study</a>
+      </div>
 
       <article>
         <header class="article-header">
-          <p class="eyebrow">Research proposal · Data strategy · Applied AI</p>
+          <p class="eyebrow">Research proposal · Applied AI · Data strategy</p>
           <h1>Making the case for a centralised cost database</h1>
           <p class="lede">
             A self-authored proposal and proof of concept for a traditional
@@ -53,8 +56,8 @@
             <span>free and self-hosted, but dashboard quality didn't hold up</span>
           </div>
           <div class="glance__item">
-            <strong>Star schema</strong>
-            <span>5 fact tables, 6 dimension tables, three levels of cost granularity</span>
+            <strong>2 AI features</strong>
+            <span>read-only NL-to-SQL, and fact-grounded report drafting</span>
           </div>
           <div class="glance__item">
             <strong>Signed off</strong>
@@ -119,6 +122,30 @@
               <a href="https://github.com/priscilla254/construction-data-benchmarking-pipeline" rel="noopener noreferrer">the repo</a>.
             </p>
 
+            <h2>The AI layer</h2>
+            <p>
+              Report drafting for clients was manual and repetitive — the same
+              structure, rebuilt by hand, for every project. Once the database
+              existed, that became solvable properly instead of just faster: two
+              Groq-powered features, each with its own guardrail problem to solve.
+            </p>
+            <p>
+              A natural-language query assistant lets a QS ask <em>"Show top 10
+              Level2 elements by total cost"</em> and get back generated SQL plus
+              results — read-only, single-<code>SELECT</code>-only, with any
+              mutating or DDL keyword blocked outright before execution.
+            </p>
+            <p>
+              A report-drafting service generates the client-facing tender report
+              narrative itself — executive summary, commercial analysis, next
+              steps — while keeping every number locked to a "deterministic
+              facts" object built directly from the database. Groq only writes the
+              surrounding prose, explicitly instructed never to alter or invent a
+              figure, with a templated fallback if the API call fails outright.
+              The aim throughout was cutting the time spent on repetitive report
+              writing without ever letting the model touch the actual numbers.
+            </p>
+
             <h2>The Power BI vs. Superset trade-off</h2>
             <p>
               Once the pipeline reached the point of embedding dashboards
@@ -133,8 +160,8 @@
               I built it properly, not as a throwaway test: Superset ran as
               its own Dockerized sidecar service, with curated read-only BI
               views in SQL Server, and dashboards embedded into the React
-              frontend via guest tokens rather than a raw iframe. It solved
-              the cost problem outright.
+              frontend via guest tokens rather than a raw iframe. On cost alone,
+              it was a clear win.
             </p>
             <p>
               It didn't solve the actual problem. Once embedded and running
@@ -146,26 +173,6 @@
               included, and the Superset work was folded into the proposal
               as evidence the alternative had been properly tested rather
               than dismissed on assumption.
-            </p>
-
-            <h2>The AI layer, prototyped alongside</h2>
-            <p>
-              With the database and BI decision settled, the same PoC
-              included two Groq-powered features, each with its own
-              guardrail problem to solve. A natural-language query
-              assistant lets a QS ask <em>"Show top 10 Level2 elements by
-              total cost"</em> and get back generated SQL plus results —
-              read-only, single-<code>SELECT</code>-only, with any
-              mutating or DDL keyword blocked outright before execution.
-            </p>
-            <p>
-              A report-drafting service generates client-facing tender
-              report narrative — executive summary, commercial analysis,
-              next steps — while keeping every number locked to a
-              "deterministic facts" object built directly from the
-              database. Groq only writes the surrounding prose, explicitly
-              instructed never to alter or invent a figure, with a
-              templated fallback if the API call fails outright.
             </p>
 
             <h2>Where this landed</h2>
@@ -236,6 +243,13 @@
           </aside>
         </div>
       </article>
+
+      <nav class="pager" aria-label="More case studies">
+        <a class="pager__link pager__link--prev" href="../synthetic-age-estimation/">
+          <span class="pager__label">Previous case study</span>
+          <span class="pager__title">Can synthetic faces train a fairer age estimator?</span>
+        </a>
+      </nav>
     </main>
 
     <footer class="site-footer">
