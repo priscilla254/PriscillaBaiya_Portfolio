@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAG Construction Assistant — Priscilla Baiya</title>
+    <meta
+      name="description"
+      content="Case study: a cited Q&A assistant over UK building regulations and HSE site safety guidance. Hybrid retrieval, grounded generation, Recall@5 of 0.90 on a 20-question labelled eval."
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/case-study.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="wordmark" href="../../">Priscilla Baiya</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="../../#about">About</a>
+          <a href="../../#work">Work</a>
+          <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="article-wrap article-wrap--wide">
+      <div class="page-nav">
+        <a class="back" href="../../">← Home</a>
+        <a class="back" href="../synthetic-age-estimation/">Next case study →</a>
+      </div>
+
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">Applied AI</p>
+          <h1>RAG Construction Assistant</h1>
+          <p class="lede">
+            UK building regulations and HSE site guidance run to thousands of
+            pages across three separate documents. Ctrl+F on a merged PDF
+            doesn't tell you which clause actually applies to your situation —
+            and asking a general-purpose LLM is worse, since it will confidently
+            invent a plausible-sounding clause number rather than admit it
+            doesn't know.
+          </p>
+          <p class="meta">Python, Streamlit, Chroma, Groq</p>
+        </header>
+
+        <div class="glance">
+          <div class="glance__item">
+            <strong>0.90</strong>
+            <span>Recall@5 on the shipped retrieval setup</span>
+          </div>
+          <div class="glance__item">
+            <strong>18 / 20</strong>
+            <span>correct on a hand-labelled question set</span>
+          </div>
+          <div class="glance__item">
+            <strong>3 sources</strong>
+            <span>Approved Documents plus HSG141 and HSG150</span>
+          </div>
+          <div class="glance__item">
+            <strong>Cited only</strong>
+            <span>answers restricted to retrieved passages — no invented clauses</span>
+          </div>
+        </div>
+
+        <div class="pipeline-flow">
+          <div class="pipeline-flow__step">
+            <strong>PDF ingest</strong>
+            <span>Official regulations and HSE guidance, parsed locally</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Per-doc chunking</strong>
+            <span>Clauses vs numbered paragraphs, not one generic splitter</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Embed</strong>
+            <span>Context-tagged chunks into Chroma</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Hybrid retrieve</strong>
+            <span>Semantic search plus keyword/BM25</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step pipeline-flow__step--accent">
+            <strong>Grounded answer</strong>
+            <span>Cited Q&amp;A from retrieved passages only</span>
+          </div>
+        </div>
+
+        <div class="layout">
+          <div class="layout__main">
+            <h2>The problem</h2>
+            <p>
+              Construction questions span two very different kinds of source
+              material: formal regulations (the Approved Documents, cited by
+              clause number like 3.24) and HSE safety guidance (HSG141 and
+              HSG150, cited by numbered paragraph instead) — different citation
+              structures that a single search strategy has to reconcile. This is
+              guidance sourced from three official documents, not legal advice.
+            </p>
+
+            <h2>What I built</h2>
+            <p>
+              A local RAG pipeline with a Streamlit front end, built end to end:
+              PDF ingestion, per-document-type chunking, embedding into a vector
+              store, hybrid keyword + semantic search, and grounded generation
+              with inline citations. The demo includes a question box, a
+              cited-sources panel, and a small gallery of test questions —
+              including ones the corpus genuinely can't answer, to show the
+              assistant declining rather than guessing. A CLI version exists
+              alongside the web app.
+            </p>
+            <p class="pipeline-note">
+              Implementation, eval set, and tests are in
+              <a href="https://github.com/priscilla254/RAG-Construction-Assistant" rel="noopener noreferrer">the repo</a>.
+            </p>
+
+            <h2>How it works</h2>
+            <p>
+              Each document gets its own chunking logic rather than one generic
+              splitter — clauses for the regulations, numbered paragraphs for
+              the HSE guides — since forcing a single strategy across genuinely
+              different document structures was the first thing that broke.
+              Every chunk is tagged with a short context trail (which Part,
+              which section) before it's embedded, so a short,
+              otherwise-meaningless clause still carries enough context to be
+              found and cited correctly — but that trail is hidden from the
+              user, who only ever sees clean answer text.
+            </p>
+            <p>
+              Retrieval combines two search methods: semantic search for
+              paraphrased questions (matching <em>"110V tools"</em> to
+              <em>"reduced low voltage"</em> even without shared wording), and
+              keyword search for exact terms and clause numbers that semantic
+              matching alone tends to blur together. An early side-by-side test
+              made the case for combining them concretely — semantic search
+              alone got 4 of 5 test questions right; adding keyword search got
+              5 of 5.
+            </p>
+            <p>
+              The most interesting finding came from a fix that didn't work.
+              One document was consistently crowding out the other two in search
+              results whenever a topic overlapped across all three — a
+              first-aid question, for example, would return five near-identical
+              passages from the same source and miss the more specific HSG150
+              guidance entirely. The obvious fix seemed to be searching each
+              document independently and merging the results, guaranteeing
+              every source a fair chance. It didn't help — recall actually
+              dropped, from 0.80 to 0.75, because forcing representation from
+              every source pulled in some genuinely weak, off-topic matches
+              just to fill the quota. What actually worked was simpler: keep
+              one combined ranking, but cap any single document at three of the
+              five results, then backfill from deeper in the list if a document
+              runs out of good matches. That one change lifted recall to 0.90
+              without forcing anything artificial.
+            </p>
+            <p>
+              Generation is restricted to only the passages retrieved for that
+              question — every claim in the answer must carry a citation number,
+              and the source list itself is built directly from the retrieved
+              chunks' own metadata, so a document name can't be invented even
+              by accident.
+            </p>
+
+            <h2>Results</h2>
+            <p>
+              Measured against 20 hand-labelled questions with known correct
+              answers, plus 5 additional questions the corpus has no answer to
+              (excluded from the accuracy score, but checked separately to
+              confirm the assistant declines rather than guesses).
+            </p>
+            <div class="results-table-wrap">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Approach</th>
+                    <th scope="col">Recall@5</th>
+                    <th scope="col">Correct (of 20)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Combined ranking, no cap</th>
+                    <td>0.80</td>
+                    <td>16</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Fully independent per-document search</th>
+                    <td>0.75</td>
+                    <td>14</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Combined ranking, capped at 3 per document (shipped)</th>
+                    <td>0.90</td>
+                    <td>18</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The two remaining misses both retrieved the correct document,
+              just not the precisely correct paragraph within it — a narrower,
+              more specific gap than a wrong-document failure.
+            </p>
+
+            <h2>What I'd do next</h2>
+            <ol>
+              <li>A reranking step or tighter paragraph-level matching to close the two remaining misses.</li>
+              <li>A query-rewriting step for ambiguous questions.</li>
+            </ol>
+
+            <h2>Links</h2>
+            <ul>
+              <li>
+                <a href="https://github.com/priscilla254/RAG-Construction-Assistant" rel="noopener noreferrer">Repository — pipeline, Streamlit app, eval, and tests</a>
+              </li>
+            </ul>
+          </div>
+
+          <aside class="layout__rail">
+            <div class="rail-card">
+              <p class="rail-card__label">Stack</p>
+              <p>Python · pdfplumber · sentence-transformers (BGE-small) · Chroma · BM25 · Groq · Streamlit · pytest</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Guardrail</p>
+              <p>
+                Answers are restricted to retrieved passages only; the demo
+                shows cited sources, not free-form generation.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Trade-off</p>
+              <p>
+                Independent per-document search looked fairer but lowered
+                accuracy by forcing in weak matches to fill a quota. Capping
+                any one document's share of the results, with backfill, worked
+                better.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <nav class="pager" aria-label="More case studies">
+        <a class="pager__link" href="../synthetic-age-estimation/">
+          <span class="pager__label">Next case study</span>
+          <span class="pager__title">Can synthetic faces train a fairer age estimator?</span>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="../../">← Back to home</a></p>
+      <p class="footer-links">
+        <a href="mailto:priscillawambui8@gmail.com">Email</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </p>
+    </footer>
+  </body>
+</html>
