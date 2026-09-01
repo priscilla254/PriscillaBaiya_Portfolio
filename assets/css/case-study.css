@@ -5,6 +5,12 @@
   max-width: var(--wide);
 }
 
+.article-wrap--wide .article-header,
+.article-wrap--wide .lede {
+  max-width: none;
+  width: 100%;
+}
+
 /* At-a-glance band: the whole story in one horizontal scan */
 .glance {
   display: grid;
