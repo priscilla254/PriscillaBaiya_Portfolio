@@ -34,7 +34,3 @@ npx serve .
 │   └── images/
 └── README.md
 ```
-
-## Deploy
-
-The folder is ready for [Vercel](https://vercel.com), Netlify, or GitHub Pages. Nested `index.html` files already map to clean URLs (`/`, `/case-studies/rag-construction-assistant/`, `/case-studies/synthetic-age-estimation/`, `/case-studies/construction-cost-benchmarking/`). Custom `vercel.json` routing is not required.
