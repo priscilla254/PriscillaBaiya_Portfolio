@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Berlin S-Bahn Delay Prediction — Priscilla Baiya</title>
+    <meta
+      name="description"
+      content="Case study: a leakage-safe LightGBM classifier predicting Berlin S-Bahn trip delays from a synthetic dataset, with temporal cross-validation, sliced error analysis, TreeSHAP explanations, and a CI-tested, Dockerised pipeline."
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/case-study.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="wordmark" href="../../">Priscilla Baiya</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="../../#about">About</a>
+          <a href="../../#work">Work</a>
+          <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="article-wrap article-wrap--wide">
+      <div class="page-nav">
+        <a class="back" href="../../">← Home</a>
+        <a class="back" href="../construction-cost-benchmarking/">← Previous case study</a>
+      </div>
+
+      <article>
+        <header class="article-header">
+          <p class="eyebrow">Portfolio project · Machine learning · Time-series classification</p>
+          <h1>Berlin S-Bahn Delay Prediction</h1>
+          <p class="lede">
+            The data is synthetic — not real S-Bahn Berlin or Deutsche Bahn
+            operational data, disclosed up front in the repo. The point of
+            this project isn't the specific numbers; it's the discipline:
+            can a trip be called delayed, before it departs, using only
+            information that would already be known on the platform —
+            without a single column that secretly encodes the answer?
+          </p>
+          <p class="meta">Python, LightGBM, Optuna, scikit-learn, SHAP, pandas</p>
+        </header>
+
+        <div class="glance">
+          <div class="glance__item">
+            <strong>0.862</strong>
+            <span>delayed-class F1 on a holdout touched exactly once</span>
+          </div>
+          <div class="glance__item">
+            <strong>131,771</strong>
+            <span>trips across 7 joined tables, zero leakage columns used</span>
+          </div>
+          <div class="glance__item">
+            <strong>0.962 vs 0.717</strong>
+            <span>F1 on strike days vs. ordinary days — the core finding</span>
+          </div>
+          <div class="glance__item">
+            <strong>48 tests</strong>
+            <span>CI-enforced, including one that fails on any leaked feature</span>
+          </div>
+        </div>
+
+        <div class="pipeline-flow">
+          <div class="pipeline-flow__step">
+            <strong>Raw SQLite</strong>
+            <span>7 tables: trips, weather, incidents, events, strikes, lines, stations</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Validate &amp; join</strong>
+            <span>Each source joined only within its known-before-departure window</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Engineer features</strong>
+            <span>Calendar, route, and lagged per-line delay-rate features</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step">
+            <strong>Tune &amp; fit once</strong>
+            <span>Optuna under TimeSeriesSplit; trees fit once, holdout scored once</span>
+          </div>
+          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
+          <div class="pipeline-flow__step pipeline-flow__step--accent">
+            <strong>Slice &amp; explain</strong>
+            <span>Error analysis by line/hour/weather, TreeSHAP, batch scoring</span>
+          </div>
+        </div>
+
+        <div class="layout">
+          <div class="layout__main">
+            <h2>The problem</h2>
+            <p>
+              A trip is delayed when <code>delay_minutes</code> is 6 or
+              more. About 3% of trips meet that rule, so a model that
+              always says "on time" is right 97% of the time and still
+              misses every single delay — accuracy is actively misleading
+              here, which is why the search objective and every reported
+              number downstream is F1 on the delayed class, not accuracy.
+              The useful question underneath that is narrower: can delay be
+              called from information that would already be sitting on the
+              departure board, before the trip happens?
+            </p>
+
+            <h2>What I built</h2>
+            <p>
+              An end-to-end pipeline, not a notebook: Pandera-validated
+              ingestion of seven related tables into typed Parquet, a
+              leakage-audited feature set, a LightGBM classifier tuned with
+              Optuna under proper time-series cross-validation, a full
+              evaluation layer (sliced error analysis, calibration, TreeSHAP),
+              and the engineering scaffolding around it — 48 tests, GitHub
+              Actions CI, a Dockerfile, a Makefile pipeline, and a batch
+              scoring entry point that takes a new table in and returns
+              predictions out.
+            </p>
+            <p class="pipeline-note">
+              Full implementation, tests, and reports are in
+              <a href="https://github.com/priscilla254/transit-disruption-prediction" rel="noopener noreferrer">the repo</a>.
+            </p>
+
+            <h2>How it works</h2>
+            <p>
+              Every column was checked against one question, written down
+              in the feature dictionary rather than applied ad hoc:
+              standing on the platform before departure, would this value
+              already be known? Two columns look like excellent features
+              and aren't — a per-line "delay propensity" score and a
+              per-incident severity weight — both built from the outcome
+              they'd be predicting, so both are excluded, with a test in CI
+              that fails if either ever reaches the model's input set.
+              Validation follows the same discipline: a 5-fold
+              <code>TimeSeriesSplit</code> walks forward through
+              January–October only, the operating threshold is chosen
+              entirely on those out-of-fold predictions, and
+              November–December is touched exactly once, after every
+              choice is already locked.
+            </p>
+            <p>
+              The most interesting result came from a fix that made things
+              worse. Delay is heavily imbalanced (about 32 on-time trips per
+              delayed one), so the obvious move is class weighting, and the
+              obvious next move after that is resampling on top of it.
+              Resampling made the holdout score worse, not better — F1 fell
+              from 0.874 (no weighting) to 0.734. The cause turned out to be
+              a cold-start specific to this data: the two in-sample strikes
+              land inside particular cross-validation folds, so some folds
+              train with zero exposure to the strike flag ever being true.
+              Oversampling delayed rows in a fold that has never seen a
+              strike just copies rows the model has no feature to explain
+              them with — it can't learn "strikes mean delay" from a flag
+              that's always 0. Once both strikes are inside the final
+              training set, the unweighted model doesn't need the help at
+              all.
+            </p>
+
+            <h2>Results</h2>
+            <p>
+              Four imbalance treatments, same search, same holdout. The
+              treatment that scored worst during tuning won on the holdout
+              that actually matters — the opposite of what tuning alone
+              would suggest.
+            </p>
+            <div class="results-table-wrap">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Treatment</th>
+                    <th scope="col">Development F1</th>
+                    <th scope="col">Holdout F1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">No weighting (shipped)</th>
+                    <td>0.297</td>
+                    <td>0.874</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Class weights</th>
+                    <td>0.379</td>
+                    <td>0.818</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Class weights, threshold sweep</th>
+                    <td>0.634</td>
+                    <td>0.818</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Class weights plus resampling</th>
+                    <td>0.435</td>
+                    <td>0.734</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The shipped, unweighted model is fit once and scored once at
+              an operating threshold of 0.30 (chosen on January–October
+              only): 793 caught delays, 91 missed, 162 false alarms out of
+              21,426 holdout trips — F1 0.862. That number is propped up by
+              strike days: 93.6% of strike-day trips are delayed and the
+              model scores F1 0.962 there, against F1 0.717 on ordinary
+              days. Slicing by line, hour, and weather all reduce to the
+              same distinction — the ring lines (S41/S42) and the commute
+              peaks are weaker because they carry more of the gradual,
+              ordinary-delay kind the model finds genuinely harder, not
+              because of uneven disruption exposure (I checked — line
+              sample sizes are balanced and strikes hit the whole network,
+              not specific lines). TreeSHAP on the same holdout confirms the
+              mechanism directly: a live strike is a single feature worth
+              roughly +5 log-odds almost by itself, while an ordinary
+              delayed trip only gets close to the cutoff by stacking several
+              moderate signals — recent per-line delay rate, weather
+              condition, peak hour — which is a genuinely closer call.
+            </p>
+
+            <h2>What I'd do next</h2>
+            <ol>
+              <li>Replace the synthetic feed with an official data agreement, and rebuild the leakage audit against that schema from scratch.</li>
+              <li>Keep the same evaluation discipline on real data — time split, threshold chosen on an earlier window, ordinary days reported separately from disruption days — since the gap between them is likely to reappear in a different shape.</li>
+              <li>Re-fit entirely rather than reuse these hyperparameters or the 0.30 cutoff, which describe this synthetic file only, and recheck calibration, the ring lines, and the commute hours before anyone treats a call as operational.</li>
+            </ol>
+
+            <h2>Links</h2>
+            <ul>
+              <li>
+                <a href="https://github.com/priscilla254/transit-disruption-prediction" rel="noopener noreferrer">Repository — pipeline, tests, model card, and reports</a>
+              </li>
+            </ul>
+          </div>
+
+          <aside class="layout__rail">
+            <div class="rail-card">
+              <p class="rail-card__label">Stack</p>
+              <p>Python · pandas · Pandera · LightGBM · Optuna · scikit-learn · SHAP · MLflow · pytest · Docker · GitHub Actions</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Finding</p>
+              <p>
+                Resampling and class weighting both looked like they should
+                help an imbalanced target. Both hurt holdout F1, because of
+                a fold-level cold-start on a disruption flag some
+                cross-validation folds never see fire.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · Confusion matrix</p>
+              <img src="../../assets/images/sbahn-confusion-matrix.png" alt="Confusion matrix at the 0.30 operating threshold on the November-December holdout: 20,380 true on-time, 162 false alarms, 91 missed delays, 793 caught delays" />
+              <p>The shipped model at its locked operating threshold, scored once.</p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Figure · SHAP</p>
+              <img src="../../assets/images/sbahn-shap-beeswarm.png" alt="SHAP beeswarm plot showing recent per-line delay rate, weather condition, and route as the largest drivers of the delay prediction, with is_strike_day a smaller but highly concentrated driver" />
+              <p>Recent line delay-rate and weather dominate on average; a live strike dominates when it fires.</p>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <nav class="pager" aria-label="More case studies">
+        <a class="pager__link pager__link--prev" href="../construction-cost-benchmarking/">
+          <span class="pager__label">Previous case study</span>
+          <span class="pager__title">Applied AI for Construction costs</span>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="../../">← Back to home</a></p>
+      <p class="footer-links">
+        <a href="mailto:priscillawambui8@gmail.com">Email</a>
+        <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
+      </p>
+    </footer>
+  </body>
+</html>
