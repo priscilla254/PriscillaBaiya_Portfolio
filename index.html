@@ -29,6 +29,32 @@
       <section class="hero">
         <p class="eyebrow">MSc Computer Science (Artificial Intelligence)</p>
         <h1>Priscilla Baiya</h1>
+        <p class="lede">
+          I build and evaluate machine learning, AI and data systems.
+          MSc Computer Science (Artificial Intelligence), University of
+          Kent — Distinction expected, November 2026. I like taking a
+          messy, real problem and using data to build something that
+          solves it. Looking for a graduate role in machine learning, AI
+          engineering or data science.
+        </p>
+        <p class="hero__actions">
+          <a class="hero__cta" href="#work">View work</a>
+          <a class="hero__cta hero__cta--ghost" href="assets/cv.pdf">Download CV</a>
+        </p>
+        <div class="glance hero__proof">
+          <div class="glance__item">
+            <strong>0.90</strong>
+            <span>RAG Recall@5 on a 20-question labelled eval</span>
+          </div>
+          <div class="glance__item">
+            <strong>48 tests</strong>
+            <span>Leakage-safe ML pipeline, CI-checked on every push</span>
+          </div>
+          <div class="glance__item">
+            <strong>Signed off</strong>
+            <span>Data and AI proof of concept, approved by company directors</span>
+          </div>
+        </div>
       </section>
 
       <section class="section" id="about">
@@ -43,40 +69,23 @@
           />
           <div class="about__copy">
             <p>
-              I'm set to graduate in November 2026 with a Distinction in MSc Computer Science (Artificial Intelligence), 
-              and I'm looking for a graduate role where I can keep doing what I enjoy most: 
-              taking a messy, real problem and using data to build something that solves it.
+              I'm set to graduate in November 2026 with a Distinction in MSc
+              Computer Science (Artificial Intelligence), and I'm looking for
+              a graduate role where I can keep doing what I enjoy most:
+              taking a messy, real problem and using data to build something
+              that solves it.
             </p>
             <p>
-              During my placement as a data scientist at Costplan, a
-              quantity surveying consultancy, the company's cost data was
-              unstructured, inconsistent, and scattered across years of
-              individual spreadsheets. I standardised the inputs, then built a
-              pipeline to validate and load that data into a SQL Server
-              warehouse. The proof of concept showed the different ways
-              centralised data could actually be used, from a guarded
-              natural-language layer for querying the data directly, to
-              Power BI-ready views for benchmarking, to automated report
-              drafting. I presented the proposal directly to the company's
-              directors, and it's now signed off as a two-phase project.
+              My placement at Costplan, a quantity surveying consultancy,
+              took their scattered project spreadsheets into a proper SQL
+              Server warehouse behind a guarded natural-language query
+              layer — presented to the company's directors and signed off
+              as a two-phase build. My MSc research and a follow-up study
+              evaluated how fairly generative models handle synthetic
+              facial data across demographic groups, and my most recent
+              project is a RAG assistant that cites the exact regulation
+              behind every construction and site-safety answer it gives.
             </p>
-            <p>
-              Alongside that, my MSc research explored synthetic data for
-              facial age estimation. I built a generative pipeline and
-              evaluated how fairly it performed across different demographic
-              groups, then extended it by asking a simpler question: could
-              better starting images fix some of the bias I'd found? I
-              tested different image-generation models to see whether the
-              base identities they produced made a difference.
-            </p>
-            <p>
-                That same instinct, starting from something unclear and working
-                through it to a solution that holds up, is what drove my most recent
-                personal project: a RAG assistant that answers construction and
-                site-safety questions, citing the exact regulation or guidance
-                paragraph behind each answer rather than letting the model guess.
-            </p>
-
             <p>
               Outside of work, I'm usually training for something, whether
               that's hiking, running, or the gym. Otherwise I'm probably a
@@ -90,37 +99,42 @@
         <h2>Selected work</h2>
 
         <div class="work-grid">
-        <a class="card" href="case-studies/rag-construction-assistant/">
+        <div class="card card--multi">
           <div>
             <p class="card__meta">
               <span class="tag">Applied AI</span>
               <span class="tag">RAG</span>
+              <span class="tag">Live demo</span>
             </p>
-            <h3>RAG Construction Assistant</h3>
+            <h3>Cited RAG assistant for UK building regulations</h3>
             <p>
-              A cited Q&amp;A assistant over UK building regulations and HSE
-              site safety guidance. Retrieves the right passage first, then
-              answers only from what it found — no invented clause numbers.
-              Recall@5 of 0.90 on a 20-question labelled eval.
+              Answers site-safety questions from UK Building Regulations and
+              HSE guidance, citing the exact clause behind every answer — no
+              invented clause numbers.
             </p>
-            <p class="card__cta">Read the case study →</p>
+            <p class="card__metric"><strong>Recall@5 of 0.90</strong> on a 20-question labelled eval</p>
           </div>
-        </a>
+          <p class="card__links">
+            <a href="https://priscilla-buildregs-assistant.streamlit.app/" target="_blank" rel="noopener noreferrer">Try the live demo →</a>
+            <a class="card__cta" href="case-studies/rag-construction-assistant/">Read the case study →</a>
+          </p>
+        </div>
 
-        <a class="card" href="case-studies/synthetic-age-estimation/">
+        <a class="card" href="case-studies/sbahn-delay-prediction/">
           <div>
             <p class="card__meta">
-              <span class="tag">Case study</span>
-              <span class="tag">Biometric age estimation</span>
-              <span class="tag">MSc dissertation</span>
+              <span class="tag">Machine learning</span>
+              <span class="tag">Synthetic data</span>
+              <span class="tag">Explainability</span>
             </p>
-            <h3>Synthetic age estimation</h3>
+            <h3>Berlin S-Bahn delay prediction</h3>
             <p>
-              A three-stage generative pipeline for a demographically
-              diverse synthetic dataset — evaluated for fairness, accuracy,
-              and realism, then stress-tested against commercial
-              text-to-image models.
+              A leakage-safe LightGBM classifier for rare delays, on a
+              synthetic transit dataset — temporal cross-validation, sliced
+              error analysis, and TreeSHAP explanations, shipped with CI,
+              Docker, and a batch-scoring entry point.
             </p>
+            <p class="card__metric"><strong>F1 0.862 overall</strong> · 0.717 on non-strike days</p>
             <p class="card__cta">Read the case study →</p>
           </div>
         </a>
@@ -132,32 +146,33 @@
               <span class="tag">Data strategy</span>
               <span class="tag">Applied AI</span>
             </p>
-            <h3>Applied AI for Construction costs</h3>
+            <h3>Centralised cost database and AI layer</h3>
             <p>
-              A research proposal and proof of concept for a quantity
-              surveying consultancy — a SQL Server warehouse behind a
-              guarded natural-language SQL assistant, Power BI-ready
-              reporting views, and automated report drafting.
+              Proof of concept for a quantity surveying consultancy: a SQL
+              Server warehouse behind a guarded natural-language SQL
+              assistant, Power BI-ready reporting views, and automated
+              report drafting.
             </p>
+            <p class="card__metric"><strong>Signed off</strong> as a two-phase project</p>
             <p class="card__cta">Read the case study →</p>
           </div>
         </a>
 
-        <a class="card" href="case-studies/sbahn-delay-prediction/">
+        <a class="card" href="case-studies/synthetic-age-estimation/">
           <div>
             <p class="card__meta">
-              <span class="tag">Machine learning</span>
-              <span class="tag">Time series</span>
-              <span class="tag">Explainability</span>
+              <span class="tag">Case study</span>
+              <span class="tag">Biometric age estimation</span>
+              <span class="tag">MSc dissertation</span>
             </p>
-            <h3>Berlin S-Bahn Delay Prediction</h3>
+            <h3>Fairness in synthetic face data</h3>
             <p>
-              A leakage-safe LightGBM classifier on a synthetic transit
-              dataset — temporal cross-validation, a counterintuitive
-              imbalance-handling result traced to its cause, sliced error
-              analysis, and TreeSHAP explanations, shipped with CI, Docker,
-              and a batch-scoring entry point.
+              A three-stage generative pipeline for a demographically
+              diverse synthetic dataset — evaluated for fairness, accuracy,
+              and realism, then stress-tested in a follow-up study against
+              commercial text-to-image models.
             </p>
+            <p class="card__metric"><strong>43–49% ethnicity prediction error</strong> across all three models, follow-up study</p>
             <p class="card__cta">Read the case study →</p>
           </div>
         </a>
