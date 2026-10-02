@@ -19,6 +19,7 @@
         <nav class="nav" aria-label="Primary">
           <a href="#about">About</a>
           <a href="#work">Work</a>
+          <a href="assets/Priscilla-Baiya-CV.pdf" download="Priscilla-Baiya-CV.pdf">CV</a>
           <a href="https://github.com/priscilla254" rel="noopener noreferrer">GitHub</a>
           <a href="https://www.linkedin.com/in/priscilla-baiya-3439ba217" rel="noopener noreferrer">LinkedIn</a>
         </nav>
@@ -29,26 +30,7 @@
       <section class="hero">
         <p class="eyebrow">Machine learning · AI · Data</p>
         <h1>Priscilla Baiya</h1>
-        <p class="hero__actions">
-          <a class="hero__cta" href="#work">View work</a>
-          <a class="hero__cta hero__cta--ghost" href="assets/cv.pdf">Download CV</a>
-        </p>
-        <div class="glance hero__proof">
-          <div class="glance__item">
-            <strong>0.90</strong>
-            <span>RAG Recall@5 on a 20-question labelled eval</span>
-          </div>
-          <div class="glance__item">
-            <strong>48 tests</strong>
-            <span>Leakage-safe ML pipeline, CI-checked on every push</span>
-          </div>
-          <div class="glance__item">
-            <strong>Signed off</strong>
-            <span>Data and AI proof of concept, approved by company directors</span>
-          </div>
-        </div>
       </section>
-
       <section class="section" id="about">
         <h2>About</h2>
         <div class="about">
@@ -76,83 +58,79 @@
         <h2>Selected work</h2>
 
         <div class="work-grid">
-        <div class="card card--multi">
-          <div>
-            <p class="card__meta">
-              <span class="tag">Applied AI</span>
-              <span class="tag">RAG</span>
-              <span class="tag">Live demo</span>
-            </p>
-            <h3>Cited RAG assistant for UK building regulations</h3>
-            <p>
-              Answers site-safety questions from UK Building Regulations and
-              HSE guidance, citing the exact clause behind every answer — no
-              invented clause numbers.
-            </p>
-            <p class="card__metric"><strong>Recall@5 of 0.90</strong> on a 20-question labelled eval</p>
-          </div>
-          <p class="card__links">
-            <a href="https://priscilla-buildregs-assistant.streamlit.app/" target="_blank" rel="noopener noreferrer">Try the live demo →</a>
-            <a class="card__cta" href="case-studies/rag-construction-assistant/">Read the case study →</a>
-          </p>
-        </div>
+          <a class="card" href="case-studies/rag-construction-assistant/">
+            <div>
+              <p class="card__meta">
+                <span class="tag">Applied AI</span>
+                <span class="tag">RAG</span>
+              </p>
+              <h3>Cited RAG assistant for UK building regulations</h3>
+              <p>
+                Answers site-safety questions from UK Building Regulations and
+                HSE guidance, citing the exact clause behind every answer — no
+                invented clause numbers.
+              </p>
+              <p class="card__metric"><strong>Recall@5 of 0.90</strong> on a 20-question labelled eval</p>
+              <p class="card__cta">Read the case study →</p>
+            </div>
+          </a>
 
-        <a class="card" href="case-studies/sbahn-delay-prediction/">
-          <div>
-            <p class="card__meta">
-              <span class="tag">Machine learning</span>
-              <span class="tag">Synthetic data</span>
-              <span class="tag">Explainability</span>
-            </p>
-            <h3>Berlin S-Bahn delay prediction</h3>
-            <p>
-              A leakage-safe LightGBM classifier for rare delays, on a
-              synthetic transit dataset — temporal cross-validation, sliced
-              error analysis, and TreeSHAP explanations, shipped with CI,
-              Docker, and a batch-scoring entry point.
-            </p>
-            <p class="card__metric"><strong>F1 0.862 overall</strong> · 0.717 on non-strike days</p>
-            <p class="card__cta">Read the case study →</p>
-          </div>
-        </a>
+          <a class="card" href="case-studies/sbahn-delay-prediction/">
+            <div>
+              <p class="card__meta">
+                <span class="tag">Machine learning</span>
+                <span class="tag">Synthetic data</span>
+                <span class="tag">Explainability</span>
+              </p>
+              <h3>Berlin S-Bahn delay prediction</h3>
+              <p>
+                A leakage-safe LightGBM classifier for rare delays, on a
+                synthetic transit dataset — temporal cross-validation, sliced
+                error analysis, and TreeSHAP explanations, shipped with CI,
+                Docker, and a batch-scoring entry point.
+              </p>
+              <p class="card__metric"><strong>F1 0.862 overall</strong> · 0.717 on non-strike days</p>
+              <p class="card__cta">Read the case study →</p>
+            </div>
+          </a>
 
-        <a class="card" href="case-studies/construction-cost-benchmarking/">
-          <div>
-            <p class="card__meta">
-              <span class="tag">Placement year</span>
-              <span class="tag">Data strategy</span>
-              <span class="tag">Applied AI</span>
-            </p>
-            <h3>Centralised cost database and AI layer</h3>
-            <p>
-              Proof of concept for a quantity surveying consultancy: a SQL
-              Server warehouse behind a guarded natural-language SQL
-              assistant, Power BI-ready reporting views, and automated
-              report drafting.
-            </p>
-            <p class="card__metric"><strong>Signed off</strong> as a two-phase project</p>
-            <p class="card__cta">Read the case study →</p>
-          </div>
-        </a>
+          <a class="card" href="case-studies/construction-cost-benchmarking/">
+            <div>
+              <p class="card__meta">
+                <span class="tag">Placement year</span>
+                <span class="tag">Data strategy</span>
+                <span class="tag">Applied AI</span>
+              </p>
+              <h3>Centralised cost database and AI layer</h3>
+              <p>
+                Proof of concept for a quantity surveying consultancy: a SQL
+                Server warehouse behind a guarded natural-language SQL
+                assistant, Power BI-ready reporting views, and automated
+                report drafting.
+              </p>
+              <p class="card__metric"><strong>Signed off</strong> as a two-phase project</p>
+              <p class="card__cta">Read the case study →</p>
+            </div>
+          </a>
 
-        <a class="card" href="case-studies/synthetic-age-estimation/">
-          <div>
-            <p class="card__meta">
-              <span class="tag">Case study</span>
-              <span class="tag">Biometric age estimation</span>
-              <span class="tag">MSc dissertation</span>
-            </p>
-            <h3>Fairness in synthetic face data</h3>
-            <p>
-              A three-stage generative pipeline for a demographically
-              diverse synthetic dataset — evaluated for fairness, accuracy,
-              and realism, then stress-tested in a follow-up study against
-              commercial text-to-image models.
-            </p>
-            <p class="card__metric"><strong>43–49% ethnicity prediction error</strong> across all three models, follow-up study</p>
-            <p class="card__cta">Read the case study →</p>
-          </div>
-        </a>
+          <a class="card" href="case-studies/synthetic-age-estimation/">
+            <div>
+              <p class="card__meta">
+                <span class="tag">Case study</span>
+                <span class="tag">Biometric age estimation</span>
+                <span class="tag">MSc dissertation</span>
+              </p>
+              <h3>Fairness in synthetic face data</h3>
+              <p>
+                A three-stage generative pipeline for a demographically
+                diverse synthetic dataset — evaluated for fairness, accuracy,
+                and realism, then stress-tested in a follow-up study against
+                commercial text-to-image models.
+              </p>
+              <p class="card__metric"><strong>43–49% ethnicity prediction error</strong> across all three models, follow-up study</p>
+              <p class="card__cta">Read the case study →</p>
+            </div>
+          </a>
         </div>
       </section>
     </main>
