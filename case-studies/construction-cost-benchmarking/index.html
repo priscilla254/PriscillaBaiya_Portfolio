@@ -6,7 +6,7 @@
     <title>Applied AI for Construction costs — Priscilla Baiya</title>
     <meta
       name="description"
-      content="Case study: a research proposal and proof of concept for a quantity surveying consultancy — a centralised cost database, Power BI benchmarking dashboards, and a Groq-powered AI layer for querying and report drafting."
+      content="Case study: a research proposal and proof of concept for a quantity surveying consultancy — a SQL Server star-schema warehouse behind a guarded natural-language SQL assistant, Power BI-ready reporting views, and automated Word/PDF report drafting."
     />
     <link rel="stylesheet" href="../../assets/css/style.css" />
     <link rel="stylesheet" href="../../assets/css/case-study.css" />
@@ -50,30 +50,44 @@
           </p>
         </header>
 
+        <div class="glance">
+          <div class="glance__item">
+            <strong>86%</strong>
+            <span>line coverage on the ingestion engine, unit plus characterization tests</span>
+          </div>
+          <div class="glance__item">
+            <strong>4 layers</strong>
+            <span>guard the AI SQL assistant: parsed, allowlisted, row-capped, read-only login</span>
+          </div>
+          <div class="glance__item">
+            <strong>3 consumers</strong>
+            <span>AI assistant, Power BI views, and report drafting — one shared warehouse</span>
+          </div>
+          <div class="glance__item">
+            <strong>Signed off</strong>
+            <span>presented to all three directors; approved as a two-phase build</span>
+          </div>
+        </div>
+
         <div class="pipeline-flow">
           <div class="pipeline-flow__step">
-            <strong>Standardised Excel</strong>
-            <span>Structured input templates, replacing free-form spreadsheets</span>
+            <strong>Excel upload</strong>
+            <span>Tender workbooks, inconsistent layouts, validated on ingest</span>
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step">
-            <strong>ETL</strong>
-            <span>Clean, validate, and map into the schema</span>
+            <strong>Validate &amp; stage</strong>
+            <span>Row-level checks; errors surfaced before anything is committed</span>
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step">
-            <strong>Database</strong>
-            <span>Centralised, queryable, benchmarkable</span>
-          </div>
-          <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
-          <div class="pipeline-flow__step">
-            <strong>Power BI</strong>
-            <span>Benchmarking dashboards for the team</span>
+            <strong>Warehouse</strong>
+            <span>Idempotent, checksum-tracked migrations into a SQL Server star schema</span>
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step pipeline-flow__step--accent">
-            <strong>Applied AI</strong>
-            <span>NL-to-SQL query assistant, fact-grounded report drafting</span>
+            <strong>Three consumer layers</strong>
+            <span>Guarded AI assistant, Power BI views, automated report drafts</span>
           </div>
         </div>
 
@@ -83,11 +97,14 @@
             <p>
               Once the data problem was clear, the real question was what
               centralising it would actually enable. I pitched the company's
-              directors on three capabilities the prototype then showed: Power BI
-              dashboards for benchmarking projects against each other, a
-              natural-language layer for querying the data through a chat
-              interface, and automated drafting for client reports — the same
-              defined structure, rebuilt by hand, every time.
+              directors on three capabilities the prototype then showed: a
+              Power BI-ready reporting layer for benchmarking projects against
+              each other, a natural-language layer for querying the data
+              through a chat interface, and automated drafting for client
+              reports — the same defined structure, rebuilt by hand, every
+              time. The proof of concept ships the data model and secured
+              access for the first of those three; the dashboard itself is a
+              next step, not something built yet.
             </p>
 
             <h2>The data model</h2>
@@ -111,12 +128,24 @@
               unused simply because nothing connected it together. My research
               was aimed at fixing this.
             </p>
+            <p>
+              The warehouse is reached only through an explicit staging layer:
+              an uploaded workbook lands in <code>stg.*</code> first, where
+              every row is validated, before an idempotent commit step upserts
+              it into the <code>dbo.Dim*</code> / <code>dbo.Fact*</code>
+              tables (matched on project, contractor, and cost stage, so
+              re-ingesting a corrected workbook updates in place rather than
+              duplicating). Schema changes themselves are numbered,
+              checksum-tracked migrations — once applied, a migration is never
+              edited, only superseded by the next number, so the schema's
+              history stays auditable.
+            </p>
 
             <div class="pipeline">
               <img src="../../assets/images/schema-diagram.svg" width="1000" height="640" alt="Star schema diagram: fact_elemental_costs sits at the centre, connected to fact_projects, fact_cost_sets, fact_preliminaries, dim_elements, dim_sectors, dim_locations, and dim_cost_stages." />
             </div>
             <p class="pipeline-note">
-              Full schema definitions and the ETL logic that populates them
+              Full schema definitions and the ingestion engine that populates them
               are in
               <a href="https://github.com/priscilla254/cost-comparison-data-pipeline" rel="noopener noreferrer">the repo</a>.
             </p>
@@ -124,40 +153,61 @@
             <h2>The AI layer</h2>
             <p>
               Report drafting for clients was manual and repetitive — the same
-              structure, rebuilt by hand, for every project. I prototyped two
+              structure, rebuilt by hand, for every project. I built two
               Groq-powered features to explore whether that could be solved
               properly rather than just sped up, each with its own guardrail
-              problem to work through.
+              problem to work through, since neither can be allowed to touch
+              the warehouse directly or invent a number.
             </p>
             <p>
               The query assistant takes a question like <em>"Show top 10 Level2
-              elements by total cost"</em> and returns generated SQL plus results —
-              restricted to read-only, single-<code>SELECT</code> queries, with any
-              mutating or DDL keyword blocked outright before execution.
+              elements by total cost"</em> and returns generated SQL plus results,
+              behind four layers of guard rather than one: the generated SQL is
+              parsed as T-SQL and rejected outright if it isn't a single
+              <code>SELECT</code>; table references are checked against an
+              allowlist of warehouse views only, so staging and system tables
+              are unreachable even from a successfully parsed query; results
+              are row-capped and query-timed; and execution itself runs under a
+              dedicated read-only SQL login with no fallback to the ingestion
+              connection if anything upstream fails.
             </p>
             <p>
-              The report-drafting prototype generates the client-facing tender
+              The report-drafting feature generates the client-facing tender
               report narrative itself — executive summary, commercial analysis,
-              next steps — while keeping every number locked to a "deterministic
-              facts" object built directly from the database. Groq only writes the
-              surrounding prose, explicitly instructed never to alter or invent a
-              figure, with a templated fallback if the API call fails outright.
-              The point was testing whether the model could be trusted with the
-              writing without ever being trusted with the numbers.
+              next steps — while keeping every number locked to a
+              "deterministic facts" object built directly from the warehouse.
+              Groq only writes the surrounding prose, explicitly instructed
+              never to alter or invent a figure, with a templated fallback if
+              the API call fails outright, then exports straight to Word or
+              PDF. The point was testing whether the model could be trusted
+              with the writing without ever being trusted with the numbers.
+            </p>
+
+            <div class="results-table-wrap">
+              <img src="../../assets/images/construction-sample-ai-query.png" alt="AI SQL Assistant answering: what is the overall cost per m2 of GIFA for education projects, returning £766.53 as the average across the relevant projects" />
+            </div>
+            <p class="pipeline-note">
+              A real answer from the demo workbook — the assistant's generated SQL and row count are shown alongside the plain-English answer, not hidden behind it.
             </p>
 
             <h2>Where this landed</h2>
             <p>
               I presented the proof of concept to all three company directors,
-              split into two phases: Phase 1 covering the database and Power BI
-              benchmarking dashboards, Phase 2 extending it with the AI layer. It
-              was signed off, with a budget approved to build it out properly.
+              split into two phases: Phase 1 covering the database and
+              Power BI-ready reporting, Phase 2 extending it with the AI
+              layer. It was signed off, with a budget approved to build it
+              out properly. Since then it's grown past prototype quality: a
+              full Docker Compose stack, a three-job CI pipeline on every
+              push and pull request, and a real test suite — unit,
+              characterization, and integration tests run against an actual
+              SQL Server container, with 86% line coverage on the ingestion
+              engine specifically.
             </p>
 
             <h2>What I'd do next</h2>
             <ol>
-              <li>Take the pipeline from proof of concept to production, with proper monitoring and alerting around pipeline runs.</li>
-              <li>Add automated tests around the AI SQL guardrails specifically, since that's the highest-risk surface in the system.</li>
+              <li>Build the actual Power BI dashboard against the shipped reporting views — the PoC wires up the data model and the read-only access, but no dashboard has been built on top of it yet.</li>
+              <li>Take the pipeline from proof of concept to production, with monitoring and alerting around pipeline runs.</li>
               <li>Extend the AI layer with RAG, grounding the query assistant and report drafting in a wider set of project documents, not just the structured database fields.</li>
             </ol>
 
@@ -169,25 +219,28 @@
 
           <aside class="layout__rail">
             <div class="rail-card">
-              <p class="rail-card__label">Power BI vs. Superset</p>
-              <p>
-                Power BI's embed pricing wasn't viable for a company this size,
-                so I tested Apache Superset as a free alternative. Dropped once
-                dashboard quality didn't hold up.
-              </p>
-            </div>
-
-            <div class="rail-card">
               <p class="rail-card__label">Stack</p>
-              <p>FastAPI (Python) · React + TypeScript (Vite) · SQL Server · Groq API · Apache Superset · Docker</p>
+              <p>FastAPI (Python) · React + TypeScript (Vite) · SQL Server · Groq API · Docker</p>
             </div>
 
             <div class="rail-card">
               <p class="rail-card__label">Guardrails</p>
               <p>
-                Query assistant: single <code>SELECT</code> only, DDL
-                blocked. Report drafting: numbers locked to
-                database-sourced facts, model can't invent figures.
+                Query assistant: T-SQL parsed and rejected unless a single
+                <code>SELECT</code>; tables checked against a warehouse-view
+                allowlist; results row-capped and query-timed; run under a
+                dedicated read-only SQL login. Report drafting: numbers
+                locked to database-sourced facts, model can't invent
+                figures.
+              </p>
+            </div>
+
+            <div class="rail-card">
+              <p class="rail-card__label">Engineering</p>
+              <p>
+                Docker Compose stack, 3-job CI on every push and PR, unit +
+                characterization + integration tests against a real SQL
+                Server container, 86% coverage on the ingestion engine.
               </p>
             </div>
           </aside>
