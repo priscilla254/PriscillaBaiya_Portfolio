@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Applied AI for Construction costs — Priscilla Baiya</title>
+    <title>Centralised cost database and AI layer — Priscilla Baiya</title>
     <meta
       name="description"
       content="Case study: a research proposal and proof of concept for a quantity surveying consultancy — a SQL Server star-schema warehouse behind a guarded natural-language SQL assistant, Power BI-ready reporting views, and automated Word/PDF report drafting."
@@ -30,43 +30,43 @@
     <main id="main" class="article-wrap article-wrap--wide">
       <div class="page-nav">
         <a class="back" href="../../">← Home</a>
-        <a class="back" href="../synthetic-age-estimation/">← Previous case study</a>
-        <a class="back" href="../sbahn-delay-prediction/">Next case study →</a>
+        <a class="back" href="../sbahn-delay-prediction/">← Previous case study</a>
+        <a class="back" href="../synthetic-age-estimation/">Next case study →</a>
       </div>
 
       <article>
         <header class="article-header">
           <p class="eyebrow">Research proposal · Applied AI · Data strategy</p>
-          <h1>Applied AI for Construction costs</h1>
+          <h1>Centralised cost database and AI layer</h1>
           <p class="lede">
-            Costplan is a quantity surveying consultancy where project cost data
+            During my placement year working in construction consultancy, project cost data
             lived in individual Excel workbooks, one per project. Comparing
             costs across projects meant manually reconciling different
-            spreadsheets, relying on memory and experience, and with no formal
+            spreadsheets, relying on memory and experience. With no formal
             database, benchmarking new estimates against past projects was done
-            the same way.
+            the same way. This is a sample project of the same problem but generalised to any construction project.
           </p>
           <p class="meta">
-            Placement year, Costplan Services · Research proposal → proof of concept
+            Placement year · Research problem → proof of concept.
           </p>
         </header>
 
         <div class="glance">
           <div class="glance__item">
             <strong>86%</strong>
-            <span>line coverage on the ingestion engine, unit plus characterization tests</span>
+            <span>test coverage of ingestion pipeline; unit and integration tests</span>
           </div>
           <div class="glance__item">
             <strong>4 layers</strong>
-            <span>guard the AI SQL assistant: parsed, allowlisted, row-capped, read-only login</span>
+            <span>guardrails for the AI SQL assistant: parsed, allowlisted, row-capped, read-only login</span>
           </div>
           <div class="glance__item">
-            <strong>3 consumers</strong>
-            <span>AI assistant, Power BI views, and report drafting — one shared warehouse</span>
+            <strong>3 use cases</strong>
+            <span>AI assistant, Power BI views, and report drafting from one shared database</span>
           </div>
           <div class="glance__item">
             <strong>Signed off</strong>
-            <span>presented to all three directors; approved as a two-phase build</span>
+            <span>presented to directors; approved as a two-phase build</span>
           </div>
         </div>
 
@@ -82,33 +82,27 @@
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step">
-            <strong>Warehouse</strong>
-            <span>Idempotent, checksum-tracked migrations into a SQL Server star schema</span>
+            <strong>Database</strong>
+            <span>Idempotent, checksum-tracked migrations into a SQL Server database schema</span>
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step pipeline-flow__step--accent">
-            <strong>Three consumer layers</strong>
+            <strong>Outputs</strong>
             <span>Guarded AI assistant, Power BI views, automated report drafts</span>
           </div>
         </div>
 
         <div class="layout">
           <div class="layout__main">
-            <h2>What centralised data could unlock</h2>
+            <h2>The problem</h2>
             <p>
-              Once the data problem was clear, the real question was what
-              centralising it would actually enable. I pitched the company's
-              directors on three capabilities the prototype then showed: a
-              Power BI-ready reporting layer for benchmarking projects against
-              each other, a natural-language layer for querying the data
-              through a chat interface, and automated drafting for client
-              reports — the same defined structure, rebuilt by hand, every
-              time. The proof of concept ships the data model and secured
-              access for the first of those three; the dashboard itself is a
-              next step, not something built yet.
+              The problem was that project cost data was scattered across multiple Excel workbooks, one per project.
+              Comparing costs across projects was done manually, relying on memory and experience. With no formal
+              database, benchmarking new estimates against past projects was done the same way. The objective of this project was to
+              centralise the data and enable automated benchmarking of new estimates against past projects.
             </p>
 
-            <h2>The data model</h2>
+            <h2>What I built</h2>
             <p>
               Construction cost data has real structure once you look past the
               spreadsheets. Costs break down into three levels. Level 1 is the
@@ -126,17 +120,15 @@
               and inflation indices are published by governing bodies too, so a
               ten-year-old project's costs can still be adjusted and compared
               fairly against a new one. Most of that historical data was sitting
-              unused simply because nothing connected it together. My research
-              was aimed at fixing this.
+              unused. My research was aimed at fixing this.
             </p>
             <p>
-              The warehouse is reached only through an explicit staging layer:
+              The database is reached only through an explicit staging layer:
               an uploaded workbook lands in <code>stg.*</code> first, where
               every row is validated, before an idempotent commit step upserts
               it into the <code>dbo.Dim*</code> / <code>dbo.Fact*</code>
               tables (matched on project, contractor, and cost stage, so
-              re-ingesting a corrected workbook updates in place rather than
-              duplicating). Schema changes themselves are numbered,
+              re-ingesting a corrected workbook updates in place). Schema changes themselves are numbered,
               checksum-tracked migrations — once applied, a migration is never
               edited, only superseded by the next number, so the schema's
               history stays auditable.
@@ -153,63 +145,42 @@
 
             <h2>The AI layer</h2>
             <p>
-              Report drafting for clients was manual and repetitive — the same
-              structure, rebuilt by hand, for every project. I built two
-              Groq-powered features to explore whether that could be solved
-              properly rather than just sped up, each with its own guardrail
-              problem to work through, since neither can be allowed to touch
-              the warehouse directly or invent a number.
+              There were 2 use cases: a query assistant and a report drafting feature.
             </p>
             <p>
               The query assistant takes a question like <em>"Show top 10 Level2
-              elements by total cost"</em> and returns generated SQL plus results,
-              behind four layers of guard rather than one: the generated SQL is
-              parsed as T-SQL and rejected outright if it isn't a single
+              elements by total cost"</em> and returns generated SQL plus results.
+              The generated SQL is parsed as T-SQL and rejected outright if it isn't a single
               <code>SELECT</code>; table references are checked against an
-              allowlist of warehouse views only, so staging and system tables
+              allowlist of database views only, so staging and system tables
               are unreachable even from a successfully parsed query; results
               are row-capped and query-timed; and execution itself runs under a
-              dedicated read-only SQL login with no fallback to the ingestion
-              connection if anything upstream fails.
+              dedicated read-only SQL login.
             </p>
             <p>
               The report-drafting feature generates the client-facing tender
-              report narrative itself — executive summary, commercial analysis,
-              next steps — while keeping every number locked to a
-              "deterministic facts" object built directly from the warehouse.
-              Groq only writes the surrounding prose, explicitly instructed
-              never to alter or invent a figure, with a templated fallback if
-              the API call fails outright, then exports straight to Word or
-              PDF. The point was testing whether the model could be trusted
-              with the writing without ever being trusted with the numbers.
+              report narrative itself. For my use case, I simplified it to just an executive summary, commercial analysis and next steps.
+              The numbers are locked to a "deterministic facts" object built directly from the database.
             </p>
 
             <div class="results-table-wrap">
               <img src="../../assets/images/construction-sample-ai-query.png" alt="AI SQL Assistant answering: what is the overall cost per m2 of GIFA for education projects, returning £766.53 as the average across the relevant projects" />
             </div>
             <p class="pipeline-note">
-              A real answer from the demo workbook — the assistant's generated SQL and row count are shown alongside the plain-English answer, not hidden behind it.
+              A real answer from the demo UI. The assistant's generated SQL and row count are shown for reference.
             </p>
 
-            <h2>Where this landed</h2>
+            <h2>Results</h2>
             <p>
-              I presented the proof of concept to all three company directors,
-              split into two phases: Phase 1 covering the database and
-              Power BI-ready reporting, Phase 2 extending it with the AI
-              layer. It was signed off, with a budget approved to build it
-              out properly. Since then it's grown past prototype quality: a
-              full Docker Compose stack, a three-job CI pipeline on every
-              push and pull request, and a real test suite — unit,
-              characterization, and integration tests run against an actual
-              SQL Server container, with 86% line coverage on the ingestion
-              engine specifically.
+             The project was signed off by the directors and approved for a two-phase build. The first phase covered the database 
+             and Power BI-ready reporting. The second phase extended it with the AI layer.
             </p>
 
             <h2>What I'd do next</h2>
             <ol>
               <li>Build the actual Power BI dashboard against the shipped reporting views — the PoC wires up the data model and the read-only access, but no dashboard has been built on top of it yet.</li>
               <li>Take the pipeline from proof of concept to production, with monitoring and alerting around pipeline runs.</li>
-              <li>Extend the AI layer with RAG, grounding the query assistant and report drafting in a wider set of project documents, not just the structured database fields.</li>
+              <li>Extend the AI layer with RAG, grounding the query assistant and report drafting in a wider set of project documents.</li>
             </ol>
 
             <h2>Links</h2>
@@ -228,11 +199,10 @@
               <p class="rail-card__label">Guardrails</p>
               <p>
                 Query assistant: T-SQL parsed and rejected unless a single
-                <code>SELECT</code>; tables checked against a warehouse-view
+                <code>SELECT</code>; tables checked against a database-view
                 allowlist; results row-capped and query-timed; run under a
                 dedicated read-only SQL login. Report drafting: numbers
-                locked to database-sourced facts, model can't invent
-                figures.
+                locked to database-sourced facts.
               </p>
             </div>
 
@@ -249,13 +219,13 @@
       </article>
 
       <nav class="pager" aria-label="More case studies">
-        <a class="pager__link pager__link--prev" href="../synthetic-age-estimation/">
+        <a class="pager__link pager__link--prev" href="../sbahn-delay-prediction/">
           <span class="pager__label">Previous case study</span>
-          <span class="pager__title">Can synthetic faces train a fairer age estimator?</span>
-        </a>
-        <a class="pager__link" href="../sbahn-delay-prediction/">
-          <span class="pager__label">Next case study</span>
           <span class="pager__title">Berlin S-Bahn Delay Prediction</span>
+        </a>
+        <a class="pager__link" href="../synthetic-age-estimation/">
+          <span class="pager__label">Next case study</span>
+          <span class="pager__title">Can synthetic faces train a fairer age estimator?</span>
         </a>
       </nav>
     </main>

@@ -213,14 +213,13 @@
   overflow-x: auto;
 }
 
-.results-table tbody tr:last-child {
+.results-table tbody tr.is-shipped {
   background: var(--accent-soft);
 }
 
-.results-table tbody tr:last-child th,
-.results-table tbody tr:last-child td {
+.results-table tbody tr.is-shipped th,
+.results-table tbody tr.is-shipped td {
   font-weight: 600;
-  border-bottom: none;
 }
 
 @media (max-width: 900px) {
@@ -258,6 +257,11 @@
   .glance {
     grid-template-columns: 1fr;
   }
+
+  .page-nav .back:first-child {
+    flex: 1 0 100%;
+    margin-right: 0;
+  }
 }
 
 /* Keep the sticky rail from painting over the footer */
@@ -273,6 +277,20 @@ body > .site-footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
+}
+
+.work-grid .card {
+  height: 100%;
+}
+
+.work-grid .card > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.work-grid .card .card__cta {
+  margin-top: auto;
 }
 
 @media (max-width: 720px) {
@@ -292,8 +310,12 @@ body > .site-footer {
 .page-nav {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.75rem 1.5rem;
+}
+
+.page-nav .back:first-child {
+  margin-right: auto;
 }
 
 .page-nav .back {

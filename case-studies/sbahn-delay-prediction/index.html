@@ -30,20 +30,19 @@
     <main id="main" class="article-wrap article-wrap--wide">
       <div class="page-nav">
         <a class="back" href="../../">← Home</a>
-        <a class="back" href="../construction-cost-benchmarking/">← Previous case study</a>
+        <a class="back" href="../rag-construction-assistant/">← Previous case study</a>
+        <a class="back" href="../construction-cost-benchmarking/">Next case study →</a>
       </div>
 
       <article>
         <header class="article-header">
-          <p class="eyebrow">Portfolio project · Machine learning · Time-series classification</p>
+          <p class="eyebrow">Portfolio project · Machine learning · Binary classification</p>
           <h1>Berlin S-Bahn Delay Prediction</h1>
           <p class="lede">
-            The data is synthetic — not real S-Bahn Berlin or Deutsche Bahn
-            operational data, disclosed up front in the repo. The point of
-            this project isn't the specific numbers; it's the discipline:
-            can a trip be called delayed, before it departs, using only
-            information that would already be known on the platform —
-            without a single column that secretly encodes the answer?
+            This project uses synthetic data, not real S-Bahn Berlin or Deutsche Bahn
+            operational data. The objective of this project was to determine
+            if a trip can be called delayed before it departs, using only
+            information that would already be known before departure.
           </p>
           <p class="meta">Python, LightGBM, Optuna, scikit-learn, SHAP, pandas</p>
         </header>
@@ -51,19 +50,19 @@
         <div class="glance">
           <div class="glance__item">
             <strong>0.862</strong>
-            <span>delayed-class F1 on a holdout touched exactly once</span>
+            <span>delayed-class F1 on a final holdout set</span>
           </div>
           <div class="glance__item">
             <strong>131,771</strong>
-            <span>trips across 7 joined tables, zero leakage columns used</span>
+            <span>trips across 7 joined tables, excluding any columns that could potentially encode the answer</span>
           </div>
           <div class="glance__item">
             <strong>0.962 vs 0.717</strong>
-            <span>F1 on strike days vs. ordinary days — the core finding</span>
+            <span>F1 on strike days vs. ordinary days.</span>
           </div>
           <div class="glance__item">
             <strong>48 tests</strong>
-            <span>CI-enforced, including one that fails on any leaked feature</span>
+            <span>CI-enforced.</span>
           </div>
         </div>
 
@@ -98,20 +97,19 @@
           <div class="layout__main">
             <h2>The problem</h2>
             <p>
-              A trip is delayed when <code>delay_minutes</code> is 6 or
+              A trip is delayed when delay_minutes is 6 or
               more. About 3% of trips meet that rule, so a model that
               always says "on time" is right 97% of the time and still
-              misses every single delay — accuracy is actively misleading
+              misses every single delay. Accuracy would be misleading
               here, which is why the search objective and every reported
-              number downstream is F1 on the delayed class, not accuracy.
-              The useful question underneath that is narrower: can delay be
-              called from information that would already be sitting on the
-              departure board, before the trip happens?
+              number downstream is F1 on the delayed class.
+              The objective of this project was to determine if a delay can be predicted
+              from information that would already be known before departure.
             </p>
 
             <h2>What I built</h2>
             <p>
-              An end-to-end pipeline, not a notebook: Pandera-validated
+              An end-to-end pipeline: Pandera-validated
               ingestion of seven related tables into typed Parquet, a
               leakage-audited feature set, a LightGBM classifier tuned with
               Optuna under proper time-series cross-validation, a full
@@ -128,46 +126,21 @@
 
             <h2>How it works</h2>
             <p>
-              Every column was checked against one question, written down
-              in the feature dictionary rather than applied ad hoc:
-              standing on the platform before departure, would this value
-              already be known? Two columns look like excellent features
-              and aren't — a per-line "delay propensity" score and a
-              per-incident severity weight — both built from the outcome
-              they'd be predicting, so both are excluded, with a test in CI
-              that fails if either ever reaches the model's input set.
-              Validation follows the same discipline: a 5-fold
-              <code>TimeSeriesSplit</code> walks forward through
-              January–October only, the operating threshold is chosen
-              entirely on those out-of-fold predictions, and
-              November–December is touched exactly once, after every
-              choice is already locked.
+              Every column was checked against one question: would this value
+              already be known before departure? Two columns failed that test
+              and were dropped — a per-line "delay propensity" score and a
+              per-incident severity weight. Validation is a 5-fold
+              TimeSeriesSplit that walks forward through January–October only.
+              The operating threshold is chosen on those out-of-fold
+              predictions, and November–December is touched exactly once, after
+              every choice is already locked.
             </p>
             <p>
-              The most interesting result came from a fix that made things
-              worse. Delay is heavily imbalanced (about 32 on-time trips per
-              delayed one), so the obvious move is class weighting, and the
-              obvious next move after that is resampling on top of it.
-              Resampling made the holdout score worse, not better — F1 fell
-              from 0.874 (no weighting) to 0.734. The cause turned out to be
-              a cold-start specific to this data: the two in-sample strikes
-              land inside particular cross-validation folds, so some folds
-              train with zero exposure to the strike flag ever being true.
-              Oversampling delayed rows in a fold that has never seen a
-              strike just copies rows the model has no feature to explain
-              them with — it can't learn "strikes mean delay" from a flag
-              that's always 0. Once both strikes are inside the final
-              training set, the unweighted model doesn't need the help at
-              all.
+              As the data was heavily imbalanced, I tried 2 approaches to improve the model's performance: class weighting and resampling.
+              Both hurt holdout F1; it fell from 0.874 (no weighting) to 0.734.
             </p>
 
             <h2>Results</h2>
-            <p>
-              Four imbalance treatments, same search, same holdout. The
-              treatment that scored worst during tuning won on the holdout
-              that actually matters — the opposite of what tuning alone
-              would suggest.
-            </p>
             <div class="results-table-wrap">
               <table class="results-table">
                 <thead>
@@ -178,7 +151,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr class="is-shipped">
                     <th scope="row">No weighting (shipped)</th>
                     <td>0.297</td>
                     <td>0.874</td>
@@ -202,29 +175,27 @@
               </table>
             </div>
             <p>
-              The shipped, unweighted model is fit once and scored once at
-              an operating threshold of 0.30 (chosen on January–October
-              only): 793 caught delays, 91 missed, 162 false alarms out of
-              21,426 holdout trips — F1 0.862. That number is propped up by
-              strike days: 93.6% of strike-day trips are delayed and the
-              model scores F1 0.962 there, against F1 0.717 on ordinary
-              days. Slicing by line, hour, and weather all reduce to the
-              same distinction — the ring lines (S41/S42) and the commute
-              peaks are weaker because they carry more of the gradual,
-              ordinary-delay kind the model finds genuinely harder, not
-              because of uneven disruption exposure (I checked — line
-              sample sizes are balanced and strikes hit the whole network,
-              not specific lines). TreeSHAP on the same holdout confirms the
-              mechanism directly: a live strike is a single feature worth
-              roughly +5 log-odds almost by itself, while an ordinary
-              delayed trip only gets close to the cutoff by stacking several
-              moderate signals — recent per-line delay rate, weather
-              condition, peak hour — which is a genuinely closer call.
+              The shipped model is the unweighted one. It is fit once on
+              January–October and scored once on November–December, at a
+              threshold of 0.30 chosen on the development window only: 793
+              caught delays, 91 missed, 162 false alarms, out of 21,426
+              holdout trips — F1 0.862.
+            </p>
+            <p>
+              That 0.862 is lifted by strike days. 93.6% of strike-day trips
+              are delayed, and F1 there is 0.962. On ordinary days it is
+              0.717. The weaker slices — the ring lines S41/S42 and the
+              commute peaks — are weaker because they carry more of that
+              ordinary-delay case.
+              TreeSHAP on the same holdout confirms that: a live strike is one
+              feature worth about +5 log-odds on its own, while an ordinary
+              delayed trip only reaches the cutoff by stacking smaller
+              signals — recent per-line delay rate, weather, peak hour.
             </p>
 
             <h2>What I'd do next</h2>
             <ol>
-              <li>Replace the synthetic feed with an official data agreement, and rebuild the leakage audit against that schema from scratch.</li>
+              <li>Replace the synthetic feed with real data, and rebuild the leakage audit against that schema from scratch.</li>
               <li>Keep the same evaluation discipline on real data — time split, threshold chosen on an earlier window, ordinary days reported separately from disruption days — since the gap between them is likely to reappear in a different shape.</li>
               <li>Re-fit entirely rather than reuse these hyperparameters or the 0.30 cutoff, which describe this synthetic file only, and recheck calibration, the ring lines, and the commute hours before anyone treats a call as operational.</li>
             </ol>
@@ -247,9 +218,10 @@
               <p class="rail-card__label">Finding</p>
               <p>
                 Resampling and class weighting both looked like they should
-                help an imbalanced target. Both hurt holdout F1, because of
-                a fold-level cold-start on a disruption flag some
-                cross-validation folds never see fire.
+                help an imbalanced target. Both hurt holdout F1. The first
+                time-series fold trains before any strike has happened, then
+                has to score one. Overweighting the delayed trips in that fold
+                cannot teach a flag that it has never seen.
               </p>
             </div>
 
@@ -262,16 +234,20 @@
             <div class="rail-card">
               <p class="rail-card__label">Figure · SHAP</p>
               <img src="../../assets/images/sbahn-shap-beeswarm.png" alt="SHAP beeswarm plot showing recent per-line delay rate, weather condition, and route as the largest drivers of the delay prediction, with is_strike_day a smaller but highly concentrated driver" />
-              <p>Recent line delay-rate and weather dominate on average; a live strike dominates when it fires.</p>
+              <p>Recent line delay-rate and weather dominate on average; a live strike dominates when it occurs.</p>
             </div>
           </aside>
         </div>
       </article>
 
       <nav class="pager" aria-label="More case studies">
-        <a class="pager__link pager__link--prev" href="../construction-cost-benchmarking/">
+        <a class="pager__link pager__link--prev" href="../rag-construction-assistant/">
           <span class="pager__label">Previous case study</span>
-          <span class="pager__title">Applied AI for Construction costs</span>
+          <span class="pager__title">RAG Construction Assistant</span>
+        </a>
+        <a class="pager__link" href="../construction-cost-benchmarking/">
+          <span class="pager__label">Next case study</span>
+          <span class="pager__title">Centralised cost database and AI layer</span>
         </a>
       </nav>
     </main>

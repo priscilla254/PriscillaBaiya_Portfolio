@@ -110,6 +110,7 @@ a:hover {
   letter-spacing: -0.02em;
   color: var(--ink);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav {
@@ -206,7 +207,7 @@ a:hover {
 }
 
 .section {
-  padding-bottom: 5rem;
+  padding-bottom: 2.25rem;
 }
 
 .section h2 {
@@ -330,10 +331,14 @@ a.card:hover .card__cta {
   flex-wrap: wrap;
   gap: 0.75rem 1.5rem;
   justify-content: space-between;
-  padding: 1.5rem 0 2.5rem;
+  padding: 2.25rem 0;
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.site-footer p {
+  margin: 0;
 }
 
 .site-footer a {

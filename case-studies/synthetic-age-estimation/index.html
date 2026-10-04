@@ -30,8 +30,7 @@
     <main id="main" class="article-wrap article-wrap--wide">
       <div class="page-nav">
         <a class="back" href="../../">← Home</a>
-        <a class="back" href="../rag-construction-assistant/">← Previous case study</a>
-        <a class="back" href="../construction-cost-benchmarking/">Next case study →</a>
+        <a class="back" href="../construction-cost-benchmarking/">← Previous case study</a>
       </div>
 
       <article>
@@ -39,10 +38,8 @@
           <p class="eyebrow">Case study · Biometric age estimation · Fairness</p>
           <h1>Can synthetic faces train a fairer age estimator?</h1>
           <p class="lede">
-            A generative pipeline for a demographically balanced, privacy-conscious dataset for facial age estimation,
-             evaluated for fairness, accuracy, and realism, 
-             then extended to test whether better base images could improve the results.
-       
+            A generative pipeline for a demographically balanced, privacy-conscious dataset for facial age estimation
+            was evaluated for fairness, accuracy, and realism, then extended to test whether better base images could improve results.
           </p>
           <p class="meta">
             MSc Computer Science (Artificial Intelligence) · University of Kent
@@ -61,7 +58,7 @@
           </div>
           <div class="glance__item">
             <strong>13–17</strong>
-            <span>age bin where the model fails hardest — the one that matters most</span>
+            <span>age bin where the model fails hardest — the one that matters most for age-restricted services</span>
           </div>
           <div class="glance__item">
             <strong>43–49%</strong>
@@ -73,7 +70,7 @@
           Age estimation from a face looks like a straightforward regression
           problem until you look at the data. Public benchmarks are
           privacy-sensitive, demographically skewed, and thin exactly where
-          it matters most — the 16–17 boundary that separates minors from
+          it matters most — the 16–17 age bin boundary that separates minors from
           adults in age-restricted services. This project asked a practical
           question: if we <em>generate</em> the missing faces instead of
           collecting them, can the result support fairer age estimation —
@@ -96,7 +93,7 @@
             <h2>Approach</h2>
             <p>
               Three deliberate stages: generate a
-              diverse identity, age it convincingly, then restore artefacts
+              diverse identity, age it convincingly, then restore artifacts
               introduced along the way.
             </p>
 
@@ -112,15 +109,14 @@
             <h2>What the results showed</h2>
             <p>
               Synthetic pipelines produced visually convincing,
-              demographically broad images — but fairness didn't come for
-              free. FairFace classification held up well for some groups
+              demographically broad images. FairFace classification held up well for some groups
               (Indian 1.00, East Asian 0.97, White 0.92) and broke down for
               others (Southeast Asian 0.34, Middle Eastern 0.39) — the
               generative model itself wasn't capturing some demographic
               features distinctly enough.
             </p>
             <p>
-              The more consequential failure was in age, not ethnicity.
+              The more consequential failure was in age estimation.
               InsightFace correctly classified only 4 of the 13–17 images
               and 3 of the 18–20 images, with most pushed into older bins —
               a systematic overestimation of minors' ages, which is exactly
@@ -131,9 +127,9 @@
 
             <h2>Follow-up: do off-the-shelf tools do any better?</h2>
             <p>
-              The dissertation used SDXL to generate the base identities in Stage 1 -
+              The dissertation used SDXL to generate the base identities in Stage 1 —
               but SDXL is only one option. We wondered if other text-to-image models
-              could do better at generating better base identities.
+              could generate better base identities.
             </p>
             <div class="result-grid">
               <div class="stat">
@@ -164,7 +160,7 @@
             <p>
               The takeaway held up, sharper this time: even state-of-the-art
               commercial generators carry substantial, unevenly distributed
-              demographic bias. Convenience doesn't buy fairness for free.
+              demographic bias.
             </p>
 
             <h2>What I'd do next</h2>
@@ -212,13 +208,9 @@
       </article>
 
       <nav class="pager" aria-label="More case studies">
-        <a class="pager__link pager__link--prev" href="../rag-construction-assistant/">
+        <a class="pager__link pager__link--prev" href="../construction-cost-benchmarking/">
           <span class="pager__label">Previous case study</span>
-          <span class="pager__title">RAG Construction Assistant</span>
-        </a>
-        <a class="pager__link" href="../construction-cost-benchmarking/">
-          <span class="pager__label">Next case study</span>
-          <span class="pager__title">Applied AI for Construction costs</span>
+          <span class="pager__title">Centralised cost database and AI layer</span>
         </a>
       </nav>
     </main>

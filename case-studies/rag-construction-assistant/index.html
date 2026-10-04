@@ -30,7 +30,7 @@
     <main id="main" class="article-wrap article-wrap--wide">
       <div class="page-nav">
         <a class="back" href="../../">← Home</a>
-        <a class="back" href="../synthetic-age-estimation/">Next case study →</a>
+        <a class="back" href="../sbahn-delay-prediction/">Next case study →</a>
       </div>
 
       <article>
@@ -39,7 +39,7 @@
           <h1>RAG Construction Assistant</h1>
           <p class="lede">
             UK building regulations and HSE site guidance run to thousands of
-            pages across three separate documents. Ctrl+F on a merged PDF
+            pages across three separate documents. Searching on a merged PDF
             doesn't tell you which clause actually applies to your situation —
             and asking a general-purpose LLM is worse, since it will confidently
             invent a plausible-sounding clause number rather than admit it
@@ -69,7 +69,7 @@
           </div>
           <div class="glance__item">
             <strong>Cited only</strong>
-            <span>answers restricted to retrieved passages — no invented clauses</span>
+            <span>answers restricted to retrieved passages.</span>
           </div>
         </div>
 
@@ -81,7 +81,7 @@
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step">
             <strong>Per-doc chunking</strong>
-            <span>Clauses vs numbered paragraphs, not one generic splitter</span>
+            <span>Clauses vs numbered paragraphs, instead of using a generic splitter</span>
           </div>
           <div class="pipeline-flow__arrow" aria-hidden="true">→</div>
           <div class="pipeline-flow__step">
@@ -107,9 +107,8 @@
               Construction questions span two very different kinds of source
               material: formal regulations (the Approved Documents, cited by
               clause number like 3.24) and HSE safety guidance (HSG141 and
-              HSG150, cited by numbered paragraph instead) — different citation
-              structures that a single search strategy has to reconcile. This is
-              guidance sourced from three official documents, not legal advice.
+              HSG150, cited by numbered paragraphs instead) — different citation
+              structures that a single search strategy has to reconcile. 
             </p>
 
             <h2>What I built</h2>
@@ -133,14 +132,13 @@
             <h2>How it works</h2>
             <p>
               Each document gets its own chunking logic rather than one generic
-              splitter — clauses for the regulations, numbered paragraphs for
-              the HSE guides — since forcing a single strategy across genuinely
+              splitter; clauses for the regulations, numbered paragraphs for
+              the HSE guides, since forcing a single strategy across genuinely
               different document structures was the first thing that broke.
               Every chunk is tagged with a short context trail (which Part,
               which section) before it's embedded, so a short,
               otherwise-meaningless clause still carries enough context to be
-              found and cited correctly — but that trail is hidden from the
-              user, who only ever sees clean answer text.
+              found and cited correctly.
             </p>
             <p>
               Retrieval combines two search methods: semantic search for
@@ -155,23 +153,22 @@
             <p>
               The most interesting finding came from a fix that didn't work.
               One document was consistently crowding out the other two in search
-              results whenever a topic overlapped across all three — a
+              results whenever a topic overlapped across all three. A
               first-aid question, for example, would return five near-identical
               passages from the same source and miss the more specific HSG150
               guidance entirely. The obvious fix seemed to be searching each
               document independently and merging the results, guaranteeing
-              every source a fair chance. It didn't help — recall actually
+              every source a fair chance. It didn't help; recall actually
               dropped, from 0.80 to 0.75, because forcing representation from
-              every source pulled in some genuinely weak, off-topic matches
-              just to fill the quota. What actually worked was simpler: keep
+              every source pulled in some weak, off-topic matches
+              just to fill the quota. What worked was simpler: keep
               one combined ranking, but cap any single document at three of the
               five results, then backfill from deeper in the list if a document
-              runs out of good matches. That one change lifted recall to 0.90
-              without forcing anything artificial.
+              runs out of good matches. That one change lifted recall to 0.90.
             </p>
             <p>
               Generation is restricted to only the passages retrieved for that
-              question — every claim in the answer must carry a citation number,
+              question. Every claim in the answer must carry a citation number,
               and the source list itself is built directly from the retrieved
               chunks' own metadata, so a document name can't be invented even
               by accident.
@@ -179,7 +176,7 @@
 
             <h2>Results</h2>
             <p>
-              Measured against 20 hand-labelled questions with known correct
+              The results below were measured against 20 hand-labelled questions with known correct
               answers, plus 5 additional questions the corpus has no answer to
               (excluded from the accuracy score, but checked separately to
               confirm the assistant declines rather than guesses).
@@ -204,7 +201,7 @@
                     <td>0.75</td>
                     <td>14</td>
                   </tr>
-                  <tr>
+                  <tr class="is-shipped">
                     <th scope="row">Combined ranking, capped at 3 per document (shipped)</th>
                     <td>0.90</td>
                     <td>18</td>
@@ -214,8 +211,7 @@
             </div>
             <p>
               The two remaining misses both retrieved the correct document,
-              just not the precisely correct paragraph within it — a narrower,
-              more specific gap than a wrong-document failure.
+              just not the precisely correct paragraph within it.
             </p>
 
             <h2>What I'd do next</h2>
@@ -246,7 +242,7 @@
               <p class="rail-card__label">Guardrail</p>
               <p>
                 Answers are restricted to retrieved passages only; the demo
-                shows cited sources, not free-form generation.
+                shows cited sources.
               </p>
             </div>
 
@@ -264,9 +260,9 @@
       </article>
 
       <nav class="pager" aria-label="More case studies">
-        <a class="pager__link" href="../synthetic-age-estimation/">
+        <a class="pager__link" href="../sbahn-delay-prediction/">
           <span class="pager__label">Next case study</span>
-          <span class="pager__title">Can synthetic faces train a fairer age estimator?</span>
+          <span class="pager__title">Berlin S-Bahn Delay Prediction</span>
         </a>
       </nav>
     </main>
